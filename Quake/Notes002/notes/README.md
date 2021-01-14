@@ -378,10 +378,10 @@ protected:
 };
 ```
 
-I have not tested this code yet! Best was to test it is to use it. So lets test it next time by looking and loading a PAK file!
+I have not tested this code yet! Best was to test it is to use it. So lets test it next time by looking and loading a PAK file!  
 
 ## Other Notes 
 Some overlooked details in Quake zone.c.
-some times they use the lib function ```memset``` where they should used ```Q_memset```. 
-some times they use the lib function ```strncpy``` where they should used ```Q_strncpy```. 
-```Cache_Compact``` was never implemented, my sense tells me this was a defragmentation function, as cache would get evicted due to LRU, memory gaps could appear, I would assume that ```Cache_Compact``` would move data around in memory to bring all the free space fragment as one big free block.
+some times they use the lib function ```memset``` where they should used ```Q_memset```.  
+some times they use the lib function ```strncpy``` where they should used ```Q_strncpy```.  
+```Cache_Compact``` was never implemented, my sense tells me this was a defragmentation function, as cache would get evicted due to LRU, memory gaps could appear, I would assume that ```Cache_Compact``` would move data around in memory to bring all the free space fragment as one big free block.  
