@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -23,73 +23,73 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef union eval_s
 {
-	string_t		string;
-	float			_float;
-	float			vector[3];
-	func_t			function;
-	int				_int;
-	int				edict;
-} eval_t;	
+   string_t		string;
+   float			_float;
+   float			vector[3];
+   func_t			function;
+   int				_int;
+   int				edict;
+} eval_t;
 
 #define	MAX_ENT_LEAFS	16
 typedef struct edict_s
 {
-	qboolean	free;
-	link_t		area;				// linked to a division node or leaf
-	
-	int			num_leafs;
-	short		leafnums[MAX_ENT_LEAFS];
+   qboolean	free;
+   link_t		area;				// linked to a division node or leaf
 
-	entity_state_t	baseline;
-	
-	float		freetime;			// sv.time when the object was freed
-	entvars_t	v;					// C exported fields from progs
+   int			num_leafs;
+   short		leafnums[MAX_ENT_LEAFS];
+
+   entity_state_t	baseline;
+
+   float		freetime;			// sv.time when the object was freed
+   entvars_t	v;					// C exported fields from progs
 // other fields from progs come immediately after
 } edict_t;
 #define	EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l,edict_t,area)
 
 //============================================================================
 
-extern	dprograms_t		*progs;
-extern	dfunction_t		*pr_functions;
-extern	char			*pr_strings;
-extern	ddef_t			*pr_globaldefs;
-extern	ddef_t			*pr_fielddefs;
-extern	dstatement_t	*pr_statements;
-extern	globalvars_t	*pr_global_struct;
-extern	float			*pr_globals;			// same as pr_global_struct
+extern	dprograms_t* progs;
+extern	dfunction_t* pr_functions;
+extern	char* pr_strings;
+extern	ddef_t* pr_globaldefs;
+extern	ddef_t* pr_fielddefs;
+extern	dstatement_t* pr_statements;
+extern	globalvars_t* pr_global_struct;
+extern	float* pr_globals;			// same as pr_global_struct
 
 extern	int				pr_edict_size;	// in bytes
 
 //============================================================================
 
-void PR_Init (void);
+void PR_Init(void);
 
-void PR_ExecuteProgram (func_t fnum);
-void PR_LoadProgs (void);
+void PR_ExecuteProgram(func_t fnum);
+void PR_LoadProgs(void);
 
-void PR_Profile_f (void);
+void PR_Profile_f(void);
 
-edict_t *ED_Alloc (void);
-void ED_Free (edict_t *ed);
+edict_t* ED_Alloc(void);
+void ED_Free(edict_t* ed);
 
-char	*ED_NewString (char *string);
+char* ED_NewString(char* string);
 // returns a copy of the string allocated from the server's string heap
 
-void ED_Print (edict_t *ed);
-void ED_Write (FILE *f, edict_t *ed);
-char *ED_ParseEdict (char *data, edict_t *ent);
+void ED_Print(edict_t* ed);
+void ED_Write(FILE* f, edict_t* ed);
+char* ED_ParseEdict(char* data, edict_t* ent);
 
-void ED_WriteGlobals (FILE *f);
-void ED_ParseGlobals (char *data);
+void ED_WriteGlobals(FILE* f);
+void ED_ParseGlobals(char* data);
 
-void ED_LoadFromFile (char *data);
+void ED_LoadFromFile(char* data);
 
 //define EDICT_NUM(n) ((edict_t *)(sv.edicts+ (n)*pr_edict_size))
 //define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/pr_edict_size)
 
-edict_t *EDICT_NUM(int n);
-int NUM_FOR_EDICT(edict_t *e);
+edict_t* EDICT_NUM(int n);
+int NUM_FOR_EDICT(edict_t* e);
 
 #define	NEXT_EDICT(e) ((edict_t *)( (byte *)e + pr_edict_size))
 
@@ -114,21 +114,21 @@ int NUM_FOR_EDICT(edict_t *e);
 extern	int		type_size[8];
 
 typedef void (*builtin_t) (void);
-extern	builtin_t *pr_builtins;
+extern	builtin_t* pr_builtins;
 extern int pr_numbuiltins;
 
 extern int		pr_argc;
 
 extern	qboolean	pr_trace;
-extern	dfunction_t	*pr_xfunction;
+extern	dfunction_t* pr_xfunction;
 extern	int			pr_xstatement;
 
 extern	unsigned short		pr_crc;
 
-void PR_RunError (char *error, ...);
+void PR_RunError(char* error, ...);
 
-void ED_PrintEdicts (void);
-void ED_PrintNum (int ent);
+void ED_PrintEdicts(void);
+void ED_PrintNum(int ent);
 
-eval_t *GetEdictFieldValue(edict_t *ed, char *field);
+eval_t* GetEdictFieldValue(edict_t* ed, char* field);
 

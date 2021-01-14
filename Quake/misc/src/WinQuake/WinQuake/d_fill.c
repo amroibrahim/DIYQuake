@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -27,62 +27,62 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_FillRect
 ================
 */
-void D_FillRect (vrect_t *rect, int color)
+void D_FillRect(vrect_t* rect, int color)
 {
-	int				rx, ry, rwidth, rheight;
-	unsigned char	*dest;
-	unsigned		*ldest;
+   int				rx, ry, rwidth, rheight;
+   unsigned char* dest;
+   unsigned* ldest;
 
-	rx = rect->x;
-	ry = rect->y;
-	rwidth = rect->width;
-	rheight = rect->height;
+   rx = rect->x;
+   ry = rect->y;
+   rwidth = rect->width;
+   rheight = rect->height;
 
-	if (rx < 0)
-	{
-		rwidth += rx;
-		rx = 0;
-	}
-	if (ry < 0)
-	{
-		rheight += ry;
-		ry = 0;
-	}
-	if (rx+rwidth > display.width)
-		rwidth = display.width - rx;
-	if (ry+rheight > display.height)
-		rheight = display.height - rx;
-		
-	if (rwidth < 1 || rheight < 1)
-		return;
+   if (rx < 0)
+   {
+      rwidth += rx;
+      rx = 0;
+   }
+   if (ry < 0)
+   {
+      rheight += ry;
+      ry = 0;
+   }
+   if (rx + rwidth > display.width)
+      rwidth = display.width - rx;
+   if (ry + rheight > display.height)
+      rheight = display.height - rx;
 
-	dest = ((byte *)display.buffer + ry*display.rowbytes + rx);
+   if (rwidth < 1 || rheight < 1)
+      return;
 
-	if (((rwidth & 0x03) == 0) && (((long)dest & 0x03) == 0))
-	{
-	// faster aligned dword clear
-		ldest = (unsigned *)dest;
-		color += color << 16;
+   dest = ((byte*)display.buffer + ry * display.rowbytes + rx);
 
-		rwidth >>= 2;
-		color += color << 8;
+   if (((rwidth & 0x03) == 0) && (((long)dest & 0x03) == 0))
+   {
+      // faster aligned dword clear
+      ldest = (unsigned*)dest;
+      color += color << 16;
 
-		for (ry=0 ; ry<rheight ; ry++)
-		{
-			for (rx=0 ; rx<rwidth ; rx++)
-				ldest[rx] = color;
-			ldest = (unsigned *)((byte*)ldest + display.rowbytes);
-		}
-	}
-	else
-	{
-	// slower byte-by-byte clear for unaligned cases
-		for (ry=0 ; ry<rheight ; ry++)
-		{
-			for (rx=0 ; rx<rwidth ; rx++)
-				dest[rx] = color;
-			dest += display.rowbytes;
-		}
-	}
+      rwidth >>= 2;
+      color += color << 8;
+
+      for (ry = 0; ry < rheight; ry++)
+      {
+         for (rx = 0; rx < rwidth; rx++)
+            ldest[rx] = color;
+         ldest = (unsigned*)((byte*)ldest + display.rowbytes);
+      }
+   }
+   else
+   {
+      // slower byte-by-byte clear for unaligned cases
+      for (ry = 0; ry < rheight; ry++)
+      {
+         for (rx = 0; rx < rwidth; rx++)
+            dest[rx] = color;
+         dest += display.rowbytes;
+      }
+   }
 }
 

@@ -27,21 +27,21 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE DISCARDABLE
 BEGIN
-    "resource.h\0"
+"resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE DISCARDABLE
 BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
+"#include ""afxres.h""\r\n"
+"\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE DISCARDABLE
 BEGIN
-    "\r\n"
-    "\0"
+"\r\n"
+"\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -66,20 +66,20 @@ STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP
 EXSTYLE WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE
 FONT 16, "Times New Roman", 0, 0, 0x1
 BEGIN
-    CTEXT           "Starting Quake...",IDC_STATIC,4,6,54,8
+CTEXT           "Starting Quake...", IDC_STATIC, 4, 6, 54, 8
 END
 
 IDD_PROGRESS DIALOGEX 0, 0, 333, 45
-STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP | 
-    WS_VISIBLE
+STYLE DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_CENTER | WS_POPUP |
+WS_VISIBLE
 EXSTYLE WS_EX_TOOLWINDOW | WS_EX_CLIENTEDGE
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Creating 15 bit inverse palette.  This is only done once, so just be patient for the next 30-60 seconds.",
-                    IDC_STATIC,7,19,319,10
-    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",0x0,7,29,
-                    319,11
-    LTEXT           "Starting Quake...",IDC_STATIC,7,4,54,8
+LTEXT           "Creating 15 bit inverse palette.  This is only done once, so just be patient for the next 30-60 seconds.",
+IDC_STATIC, 7, 19, 319, 10
+CONTROL         "Progress1", IDC_PROGRESS, "msctls_progress32", 0x0, 7, 29,
+319, 11
+LTEXT           "Starting Quake...", IDC_STATIC, 7, 4, 54, 8
 END
 
 
@@ -89,17 +89,17 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO DISCARDABLE
 BEGIN
-    IDD_DIALOG1, DIALOG
-    BEGIN
-        LEFTMARGIN, 4
-        RIGHTMARGIN, 58
-        TOPMARGIN, 6
-        BOTTOMMARGIN, 16
-        HORZGUIDE, 6
-        HORZGUIDE, 16
-    END
+IDD_DIALOG1, DIALOG
+BEGIN
+LEFTMARGIN, 4
+RIGHTMARGIN, 58
+TOPMARGIN, 6
+BOTTOMMARGIN, 16
+HORZGUIDE, 6
+HORZGUIDE, 16
+END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -109,9 +109,9 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE DISCARDABLE
 BEGIN
-    IDS_STRING1             "WinQuake"
+IDS_STRING1             "WinQuake"
 END
 
 #endif    // English (U.S.) resources
