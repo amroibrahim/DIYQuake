@@ -103,7 +103,8 @@ FILE IO
 #define	MAX_HANDLES		10
 FILE* sys_handles[MAX_HANDLES];
 
-int		findhandle(void)
+// AngryCPPCoder: Finds and empty hadle (return index in array)
+int findhandle(void)
 {
    int		i;
 
@@ -688,7 +689,6 @@ int			global_nCmdShow;
 char* argv[MAX_NUM_ARGVS];
 static char* empty_string = "";
 HWND		hwnd_dialog;
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
