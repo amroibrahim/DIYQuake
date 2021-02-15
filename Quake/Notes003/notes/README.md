@@ -118,6 +118,10 @@ typedef struct
 
 Note: The dictionary entry in the pak file (on disk) "name" is 56 bytes, but when Quake loads that into memory in copies it into 64 bytes.  
 
+Visualizing a pak file
+
+![pakfile](./img/pakfile.png)  
+
 All the loading happens in the ```COM_LoadPackFile``` let me summaries what the function does.  
 
 1. Tries to open the pack file, if failed returns null and search stops  
