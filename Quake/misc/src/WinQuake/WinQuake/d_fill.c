@@ -48,15 +48,15 @@ void D_FillRect(vrect_t* rect, int color)
       rheight += ry;
       ry = 0;
    }
-   if (rx + rwidth > display.width)
-      rwidth = display.width - rx;
-   if (ry + rheight > display.height)
-      rheight = display.height - rx;
+   if (rx + rwidth > video_state.width)
+      rwidth = video_state.width - rx;
+   if (ry + rheight > video_state.height)
+      rheight = video_state.height - rx;
 
    if (rwidth < 1 || rheight < 1)
       return;
 
-   dest = ((byte*)display.buffer + ry * display.rowbytes + rx);
+   dest = ((byte*)video_state.frame_buffer + ry * video_state.rowbytes + rx);
 
    if (((rwidth & 0x03) == 0) && (((long)dest & 0x03) == 0))
    {
@@ -71,7 +71,7 @@ void D_FillRect(vrect_t* rect, int color)
       {
          for (rx = 0; rx < rwidth; rx++)
             ldest[rx] = color;
-         ldest = (unsigned*)((byte*)ldest + display.rowbytes);
+         ldest = (unsigned*)((byte*)ldest + video_state.rowbytes);
       }
    }
    else
@@ -81,7 +81,7 @@ void D_FillRect(vrect_t* rect, int color)
       {
          for (rx = 0; rx < rwidth; rx++)
             dest[rx] = color;
-         dest += display.rowbytes;
+         dest += video_state.rowbytes;
       }
    }
 }

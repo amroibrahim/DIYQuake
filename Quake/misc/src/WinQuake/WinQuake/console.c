@@ -155,7 +155,7 @@ void Con_CheckResize(void)
    int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
    char	tbuf[CON_TEXTSIZE];
 
-   width = (display.width >> 3) - 2;
+   width = (video_state.width >> 3) - 2;
 
    if (width == con_linewidth)
       return;

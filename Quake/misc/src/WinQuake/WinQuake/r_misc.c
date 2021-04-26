@@ -52,8 +52,8 @@ void Show(void)
    vrect_t	vr;
 
    vr.x = vr.y = 0;
-   vr.width = display.width;
-   vr.height = display.height;
+   vr.width = video_state.width;
+   vr.height = video_state.height;
    vr.pnext = NULL;
    VID_Update(&vr);
 }
@@ -119,22 +119,22 @@ void R_LineGraph(int x, int y, int h)
    x += r_refdef.vrect.x;
    y += r_refdef.vrect.y;
 
-   dest = display.buffer + display.rowbytes * y + x;
+   dest = video_state.frame_buffer + video_state.rowbytes * y + x;
 
    s = r_graphheight.value;
 
    if (h > s)
       h = s;
 
-   for (i = 0; i < h; i++, dest -= display.rowbytes * 2)
+   for (i = 0; i < h; i++, dest -= video_state.rowbytes * 2)
    {
       dest[0] = 0xff;
-      *(dest - display.rowbytes) = 0x30;
+      *(dest - video_state.rowbytes) = 0x30;
    }
-   for (; i < s; i++, dest -= display.rowbytes * 2)
+   for (; i < s; i++, dest -= video_state.rowbytes * 2)
    {
       dest[0] = 0x30;
-      *(dest - display.rowbytes) = 0x30;
+      *(dest - video_state.rowbytes) = 0x30;
    }
 }
 
@@ -257,7 +257,7 @@ void WarpPalette(void)
    {
       for (j = 0; j < 3; j++)
       {
-         newpalette[i * 3 + j] = (pHostBasePalette[i * 3 + j] + basecolor[j]) / 2;
+         newpalette[i * 3 + j] = (pBasePalette[i * 3 + j] + basecolor[j]) / 2;
       }
    }
 
@@ -443,31 +443,31 @@ void R_SetupFrame(void)
    {
       if (r_dowarp)
       {
-         if ((display.width <= display.maxwarpwidth) &&
-            (display.height <= display.maxwarpheight))
+         if ((video_state.width <= video_state.maxwarpwidth) &&
+            (video_state.height <= video_state.maxwarpheight))
          {
             vrect.x = 0;
             vrect.y = 0;
-            vrect.width = display.width;
-            vrect.height = display.height;
+            vrect.width = video_state.width;
+            vrect.height = video_state.height;
 
-            R_ViewChanged(&vrect, sb_lines, display.aspect);
+            R_ViewChanged(&vrect, sb_lines, video_state.aspect);
          }
          else
          {
-            w = display.width;
-            h = display.height;
+            w = video_state.width;
+            h = video_state.height;
 
-            if (w > display.maxwarpwidth)
+            if (w > video_state.maxwarpwidth)
             {
-               h *= (float)display.maxwarpwidth / w;
-               w = display.maxwarpwidth;
+               h *= (float)video_state.maxwarpwidth / w;
+               w = video_state.maxwarpwidth;
             }
 
-            if (h > display.maxwarpheight)
+            if (h > video_state.maxwarpheight)
             {
-               h = display.maxwarpheight;
-               w *= (float)display.maxwarpheight / h;
+               h = video_state.maxwarpheight;
+               w *= (float)video_state.maxwarpheight / h;
             }
 
             vrect.x = 0;
@@ -476,19 +476,19 @@ void R_SetupFrame(void)
             vrect.height = (int)h;
 
             R_ViewChanged(&vrect,
-               (int)((float)sb_lines * (h / (float)display.height)),
-               display.aspect * (h / w) *
-               ((float)display.width / (float)display.height));
+               (int)((float)sb_lines * (h / (float)video_state.height)),
+               video_state.aspect * (h / w) *
+               ((float)video_state.width / (float)video_state.height));
          }
       }
       else
       {
          vrect.x = 0;
          vrect.y = 0;
-         vrect.width = display.width;
-         vrect.height = display.height;
+         vrect.width = video_state.width;
+         vrect.height = video_state.height;
 
-         R_ViewChanged(&vrect, sb_lines, display.aspect);
+         R_ViewChanged(&vrect, sb_lines, video_state.aspect);
       }
 
       r_viewchanged = false;

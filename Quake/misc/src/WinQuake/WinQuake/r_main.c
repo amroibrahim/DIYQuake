@@ -467,14 +467,14 @@ void R_ViewChanged(vrect_t* pvrect, int lineadj, float aspect)
    {
       Sys_MakeCodeWriteable((long)R_Surf8Start,
          (long)R_Surf8End - (long)R_Surf8Start);
-      colormap = display.colormap;
+      colormap = video_state.colormap;
       R_Surf8Patch();
    }
    else
    {
       Sys_MakeCodeWriteable((long)R_Surf16Start,
          (long)R_Surf16End - (long)R_Surf16Start);
-      colormap = display.colormap16;
+      colormap = video_state.colormap16;
       R_Surf16Patch();
    }
 #endif	// id386

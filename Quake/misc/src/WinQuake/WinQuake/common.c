@@ -1530,52 +1530,55 @@ Allways appends a 0 byte.
 cache_data_t* loadcache;
 byte* loadbuf;
 int             loadsize;
-byte* COM_LoadFile(char* path, int usehunk)
+byte* COM_LoadFile(char* path, int iHunkType)
 {
-   int h;
-   byte* buf;
-   char base[32];
-   int len;
+   int iHandle;
+   byte* pLoadBuffer;
+   char szBaseFileName[32];
+   int iFileSize;
 
-   buf = NULL;     // quiet compiler warning
+   pLoadBuffer = NULL;     // quiet compiler warning
 
-   // look for it in the filesystem or pack files
-   len = COM_OpenFile(path, &h);
-   if (h == -1)
+   // look for it in the file system or pack files
+   iFileSize = COM_OpenFile(path, &iHandle);
+   if (iHandle == -1)
       return NULL;
 
    // extract the filename base name for hunk tag
-   COM_FileBase(path, base);
+   COM_FileBase(path, szBaseFileName);
 
-   if (usehunk == 1)
-      buf = Hunk_AllocName(len + 1, base);
-   else if (usehunk == 2)
-      buf = Hunk_TempAlloc(len + 1);
-   else if (usehunk == 0)
-      buf = Z_Malloc(len + 1);
-   else if (usehunk == 3)
-      buf = Cache_Alloc(loadcache, len + 1, base);
-   else if (usehunk == 4)
+   if (iHunkType == 1)
+      pLoadBuffer = Hunk_AllocName(iFileSize + 1, szBaseFileName);
+   else if (iHunkType == 2)
+      pLoadBuffer = Hunk_TempAlloc(iFileSize + 1);
+   else if (iHunkType == 0)
+      pLoadBuffer = Z_Malloc(iFileSize + 1);
+   else if (iHunkType == 3)
+      pLoadBuffer = Cache_Alloc(loadcache, iFileSize + 1, szBaseFileName);
+   else if (iHunkType == 4)
    {
-      if (len + 1 > loadsize)
-         buf = Hunk_TempAlloc(len + 1);
+      // AngryCPPCoder, loadsize always 1024 (1K)
+      // load into temp memory if the size if more than 1k
+      // else load on the stack (loadbuf)
+      if (iFileSize + 1 > loadsize)
+         pLoadBuffer = Hunk_TempAlloc(iFileSize + 1);
       else
-         buf = loadbuf;
+         pLoadBuffer = loadbuf;
    }
    else
       Sys_Error("COM_LoadFile: bad usehunk");
 
-   if (!buf)
+   if (!pLoadBuffer)
       Sys_Error("COM_LoadFile: not enough space for %s", path);
 
-   ((byte*)buf)[len] = 0;
+   ((byte*)pLoadBuffer)[iFileSize] = 0;
 
    Draw_BeginDisc();
-   Sys_FileRead(h, buf, len);
-   COM_CloseFile(h);
+   Sys_FileRead(iHandle, pLoadBuffer, iFileSize);
+   COM_CloseFile(iHandle);
    Draw_EndDisc();
 
-   return buf;
+   return pLoadBuffer;
 }
 
 byte* COM_LoadHunkFile(char* path)

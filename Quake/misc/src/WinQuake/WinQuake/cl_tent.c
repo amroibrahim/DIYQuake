@@ -312,7 +312,7 @@ entity_t* CL_NewTempEntity(void)
    cl_visedicts[cl_numvisedicts] = ent;
    cl_numvisedicts++;
 
-   ent->colormap = display.colormap;
+   ent->colormap = video_state.colormap;
    return ent;
 }
 

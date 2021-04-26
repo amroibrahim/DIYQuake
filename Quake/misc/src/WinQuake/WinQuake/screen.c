@@ -50,7 +50,7 @@ int			scr_fullupdate;
 int			clearconsole;
 int			clearnotify;
 
-viddef_t	display;				// global video state
+viddef_t	video_state;				// global video state
 
 vrect_t* pconupdate;
 vrect_t		scr_vrect;
@@ -107,19 +107,19 @@ void SCR_EraseCenterString(void)
 {
    int		y;
 
-   if (scr_erase_center++ > display.numpages)
+   if (scr_erase_center++ > video_state.numpages)
    {
       scr_erase_lines = 0;
       return;
    }
 
    if (scr_center_lines <= 4)
-      y = display.height * 0.35;
+      y = video_state.height * 0.35;
    else
       y = 48;
 
    scr_copytop = 1;
-   Draw_TileClear(0, y, display.width, 8 * scr_erase_lines);
+   Draw_TileClear(0, y, video_state.width, 8 * scr_erase_lines);
 }
 
 void SCR_DrawCenterString(void)
@@ -140,7 +140,7 @@ void SCR_DrawCenterString(void)
    start = scr_centerstring;
 
    if (scr_center_lines <= 4)
-      y = display.height * 0.35;
+      y = video_state.height * 0.35;
    else
       y = 48;
 
@@ -150,7 +150,7 @@ void SCR_DrawCenterString(void)
       for (l = 0; l < 40; l++)
          if (start[l] == '\n' || !start[l])
             break;
-      x = (display.width - l * 8) / 2;
+      x = (video_state.width - l * 8) / 2;
       for (j = 0; j < l; j++, x += 8)
       {
          Draw_Character(x, y, start[j]);
@@ -223,7 +223,7 @@ static void SCR_CalcRefdef(void)
    float		size;
 
    scr_fullupdate = 0;		// force a background redraw
-   display.recalc_refdef = 0;
+   video_state.recalc_refdef = 0;
 
    // force the status bar to redraw
    Sbar_Changed();
@@ -262,18 +262,18 @@ static void SCR_CalcRefdef(void)
    // account of water warping
    vrect.x = 0;
    vrect.y = 0;
-   vrect.width = display.width;
-   vrect.height = display.height;
+   vrect.width = video_state.width;
+   vrect.height = video_state.height;
 
    R_SetVrect(&vrect, &scr_vrect, sb_lines);
 
    // guard against going from one mode to another that's less than half the
    // vertical resolution
-   if (scr_con_current > display.height)
-      scr_con_current = display.height;
+   if (scr_con_current > video_state.height)
+      scr_con_current = video_state.height;
 
    // notify the refresh of the change
-   R_ViewChanged(&vrect, sb_lines, display.aspect);
+   R_ViewChanged(&vrect, sb_lines, video_state.aspect);
 }
 
 
@@ -287,7 +287,7 @@ Keybinding command
 void SCR_SizeUp_f(void)
 {
    Cvar_SetValue("viewsize", scr_viewsize.value + 10);
-   display.recalc_refdef = 1;
+   video_state.recalc_refdef = 1;
 }
 
 
@@ -301,7 +301,7 @@ Keybinding command
 void SCR_SizeDown_f(void)
 {
    Cvar_SetValue("viewsize", scr_viewsize.value - 10);
-   display.recalc_refdef = 1;
+   video_state.recalc_refdef = 1;
 }
 
 //============================================================================
@@ -410,8 +410,8 @@ void SCR_DrawPause(void)
       return;
 
    pic = Draw_CachePic("gfx/pause.lmp");
-   Draw_Pic((display.width - pic->width) / 2,
-      (display.height - 48 - pic->height) / 2, pic);
+   Draw_Pic((video_state.width - pic->width) / 2,
+      (video_state.height - 48 - pic->height) / 2, pic);
 }
 
 
@@ -429,8 +429,8 @@ void SCR_DrawLoading(void)
       return;
 
    pic = Draw_CachePic("gfx/loading.lmp");
-   Draw_Pic((display.width - pic->width) / 2,
-      (display.height - 48 - pic->height) / 2, pic);
+   Draw_Pic((video_state.width - pic->width) / 2,
+      (video_state.height - 48 - pic->height) / 2, pic);
 }
 
 
@@ -455,11 +455,11 @@ void SCR_SetUpToDrawConsole(void)
 
    if (con_forcedup)
    {
-      scr_conlines = display.height;		// full screen
+      scr_conlines = video_state.height;		// full screen
       scr_con_current = scr_conlines;
    }
    else if (key_dest == key_console)
-      scr_conlines = display.height / 2;	// half screen
+      scr_conlines = video_state.height / 2;	// half screen
    else
       scr_conlines = 0;				// none visible
 
@@ -477,16 +477,16 @@ void SCR_SetUpToDrawConsole(void)
          scr_con_current = scr_conlines;
    }
 
-   if (clearconsole++ < display.numpages)
+   if (clearconsole++ < video_state.numpages)
    {
       scr_copytop = 1;
-      Draw_TileClear(0, (int)scr_con_current, display.width, display.height - (int)scr_con_current);
+      Draw_TileClear(0, (int)scr_con_current, video_state.width, video_state.height - (int)scr_con_current);
       Sbar_Changed();
    }
-   else if (clearnotify++ < display.numpages)
+   else if (clearnotify++ < video_state.numpages)
    {
       scr_copytop = 1;
-      Draw_TileClear(0, 0, display.width, con_notifylines);
+      Draw_TileClear(0, 0, video_state.width, con_notifylines);
    }
    else
       con_notifylines = 0;
@@ -641,8 +641,8 @@ void SCR_ScreenShot_f(void)
    D_EnableBackBufferAccess();	// enable direct drawing of console to back
                            //  buffer
 
-   WritePCXfile(pcxname, display.buffer, display.width, display.height, display.rowbytes,
-      pHostBasePalette);
+   WritePCXfile(pcxname, video_state.frame_buffer, video_state.width, video_state.height, video_state.rowbytes,
+      pBasePalette);
 
    D_DisableBackBufferAccess();	// for adapters that can't stay mapped in
                            //  for linear writes all the time
@@ -712,7 +712,7 @@ void SCR_DrawNotifyString(void)
 
    start = scr_notifystring;
 
-   y = display.height * 0.35;
+   y = video_state.height * 0.35;
 
    do
    {
@@ -720,7 +720,7 @@ void SCR_DrawNotifyString(void)
       for (l = 0; l < 40; l++)
          if (start[l] == '\n' || !start[l])
             break;
-      x = (display.width - l * 8) / 2;
+      x = (video_state.width - l * 8) / 2;
       for (j = 0; j < l; j++, x += 8)
          Draw_Character(x, y, start[j]);
 
@@ -790,7 +790,7 @@ void SCR_BringDownConsole(void)
       SCR_UpdateScreen();
 
    cl.cshifts[0].percent = 0;		// no area contents palette on next frame
-   VID_SetPalette(pHostBasePalette);
+   VID_SetPalette(pBasePalette);
 }
 
 
@@ -837,7 +837,7 @@ void SCR_UpdateScreen(void)
    if (scr_viewsize.value != oldscr_viewsize)
    {
       oldscr_viewsize = scr_viewsize.value;
-      display.recalc_refdef = 1;
+      video_state.recalc_refdef = 1;
    }
 
    //
@@ -846,22 +846,22 @@ void SCR_UpdateScreen(void)
    if (oldfov != scr_fov.value)
    {
       oldfov = scr_fov.value;
-      display.recalc_refdef = true;
+      video_state.recalc_refdef = true;
    }
 
    if (oldlcd_x != lcd_x.value)
    {
       oldlcd_x = lcd_x.value;
-      display.recalc_refdef = true;
+      video_state.recalc_refdef = true;
    }
 
    if (oldscreensize != scr_viewsize.value)
    {
       oldscreensize = scr_viewsize.value;
-      display.recalc_refdef = true;
+      video_state.recalc_refdef = true;
    }
 
-   if (display.recalc_refdef)
+   if (video_state.recalc_refdef)
    {
       // something changed, so reorder the screen
       SCR_CalcRefdef();
@@ -872,10 +872,10 @@ void SCR_UpdateScreen(void)
    //
    D_EnableBackBufferAccess();	// of all overlay stuff if drawing directly
 
-   if (scr_fullupdate++ < display.numpages)
+   if (scr_fullupdate++ < video_state.numpages)
    {	// clear the entire screen
       scr_copyeverything = 1;
-      Draw_TileClear(0, 0, display.width, display.height);
+      Draw_TileClear(0, 0, video_state.width, video_state.height);
       Sbar_Changed();
    }
 
@@ -889,7 +889,8 @@ void SCR_UpdateScreen(void)
                            //  for linear writes all the time
 
    VID_LockBuffer();
-
+   
+   // AngryCPPCoder: 3D View rendering
    V_RenderView();
 
    VID_UnlockBuffer();
@@ -950,8 +951,8 @@ void SCR_UpdateScreen(void)
    {
       vrect.x = 0;
       vrect.y = 0;
-      vrect.width = display.width;
-      vrect.height = display.height;
+      vrect.width = video_state.width;
+      vrect.height = video_state.height;
       vrect.pnext = 0;
 
       VID_Update(&vrect);
@@ -960,8 +961,8 @@ void SCR_UpdateScreen(void)
    {
       vrect.x = 0;
       vrect.y = 0;
-      vrect.width = display.width;
-      vrect.height = display.height - sb_lines;
+      vrect.width = video_state.width;
+      vrect.height = video_state.height - sb_lines;
       vrect.pnext = 0;
 
       VID_Update(&vrect);

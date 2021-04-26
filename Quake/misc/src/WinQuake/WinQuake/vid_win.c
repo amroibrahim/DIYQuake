@@ -54,8 +54,8 @@ static int		vid_stretched, windowed_mouse;
 static qboolean	palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
 static HICON	hIcon;
 
-// AngryCPPCoder: rename vid to display
-viddef_t	display;				// global video state
+// AngryCPPCoder: renamed vid to display
+viddef_t	video_state;				// global video state
 
 #define MODE_WINDOWED			0
 #define MODE_SETTABLE_WINDOW	2
@@ -339,7 +339,7 @@ int VID_Suspend(MGLDC* dc, m_int flags)
 
       in_mode_set = false;
 
-      display.recalc_refdef = 1;
+      video_state.recalc_refdef = 1;
 
       block_drawing = false;
 
@@ -590,24 +590,24 @@ MGLDC* createDisplayDC(int forcemem)
    // Enable page flipping even for even for blitted surfaces
    if (forcemem)
    {
-      display.numpages = 1;
+      video_state.numpages = 1;
    }
    else
    {
-      display.numpages = dc->mi.maxPage + 1;
+      video_state.numpages = dc->mi.maxPage + 1;
 
-      if (display.numpages > 1)
+      if (video_state.numpages > 1)
       {
          // Set up for page flipping
          MGL_setActivePage(dc, aPage = 1);
          MGL_setVisualPage(dc, vPage = 0, false);
       }
 
-      if (display.numpages > 3)
-         display.numpages = 3;
+      if (video_state.numpages > 3)
+         video_state.numpages = 3;
    }
 
-   if (display.numpages == 2)
+   if (video_state.numpages == 2)
       waitVRT = true;
    else
       waitVRT = false;
@@ -1349,14 +1349,14 @@ qboolean VID_SetWindowedMode(int modenum)
 
    MGL_makeCurrentDC(dibdc);
 
-   display.buffer = display.conbuffer = display.direct = dibdc->surface;
-   display.rowbytes = display.conrowbytes = dibdc->mi.bytesPerLine;
-   display.numpages = 1;
-   display.maxwarpwidth = WARP_WIDTH;
-   display.maxwarpheight = WARP_HEIGHT;
-   display.height = display.conheight = DIBHeight;
-   display.width = display.conwidth = DIBWidth;
-   display.aspect = ((float)display.height / (float)display.width) *
+   video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = dibdc->surface;
+   video_state.rowbytes = video_state.conrowbytes = dibdc->mi.bytesPerLine;
+   video_state.numpages = 1;
+   video_state.maxwarpwidth = WARP_WIDTH;
+   video_state.maxwarpheight = WARP_HEIGHT;
+   video_state.height = video_state.conheight = DIBHeight;
+   video_state.width = video_state.conwidth = DIBWidth;
+   video_state.aspect = ((float)video_state.height / (float)video_state.width) *
       (320.0 / 240.0);
 
    vid_stretched = stretched;
@@ -1394,12 +1394,12 @@ qboolean VID_SetFullscreenMode(int modenum)
    modestate = MS_FULLSCREEN;
    vid_fulldib_on_focus_mode = 0;
 
-   display.buffer = display.conbuffer = display.direct = NULL;
-   display.maxwarpwidth = WARP_WIDTH;
-   display.maxwarpheight = WARP_HEIGHT;
-   DIBHeight = display.height = display.conheight = modelist[modenum].height;
-   DIBWidth = display.width = display.conwidth = modelist[modenum].width;
-   display.aspect = ((float)display.height / (float)display.width) *
+   video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = NULL;
+   video_state.maxwarpwidth = WARP_WIDTH;
+   video_state.maxwarpheight = WARP_HEIGHT;
+   DIBHeight = video_state.height = video_state.conheight = modelist[modenum].height;
+   DIBWidth = video_state.width = video_state.conwidth = modelist[modenum].width;
+   video_state.aspect = ((float)video_state.height / (float)video_state.width) *
       (320.0 / 240.0);
 
    vid_stretched = modelist[modenum].stretched;
@@ -1507,14 +1507,14 @@ qboolean VID_SetFullDIBMode(int modenum)
 
    MGL_makeCurrentDC(dibdc);
 
-   display.buffer = display.conbuffer = display.direct = dibdc->surface;
-   display.rowbytes = display.conrowbytes = dibdc->mi.bytesPerLine;
-   display.numpages = 1;
-   display.maxwarpwidth = WARP_WIDTH;
-   display.maxwarpheight = WARP_HEIGHT;
-   display.height = display.conheight = DIBHeight;
-   display.width = display.conwidth = DIBWidth;
-   display.aspect = ((float)display.height / (float)display.width) *
+   video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = dibdc->surface;
+   video_state.rowbytes = video_state.conrowbytes = dibdc->mi.bytesPerLine;
+   video_state.numpages = 1;
+   video_state.maxwarpwidth = WARP_WIDTH;
+   video_state.maxwarpheight = WARP_HEIGHT;
+   video_state.height = video_state.conheight = DIBHeight;
+   video_state.width = video_state.conwidth = DIBWidth;
+   video_state.aspect = ((float)video_state.height / (float)video_state.width) *
       (320.0 / 240.0);
 
    vid_stretched = modelist[modenum].stretched;
@@ -1636,8 +1636,8 @@ int VID_SetMode(int modenum, unsigned char* palette)
       IN_HideMouse();
    }
 
-   window_width = display.width << vid_stretched;
-   window_height = display.height << vid_stretched;
+   window_width = video_state.width << vid_stretched;
+   window_height = video_state.height << vid_stretched;
    VID_UpdateWindowStatus();
 
    CDAudio_Resume();
@@ -1675,7 +1675,7 @@ int VID_SetMode(int modenum, unsigned char* palette)
    vid_modenum = modenum;
    Cvar_SetValue("vid_mode", (float)vid_modenum);
 
-   if (!VID_AllocBuffers(display.width, display.height))
+   if (!VID_AllocBuffers(video_state.width, video_state.height))
    {
       // couldn't get memory for this mode; try to fall back to previous mode
       VID_RestoreOldMode(original_mode);
@@ -1710,7 +1710,7 @@ int VID_SetMode(int modenum, unsigned char* palette)
    VID_SetPalette(palette);
 
    in_mode_set = false;
-   display.recalc_refdef = 1;
+   video_state.recalc_refdef = 1;
 
    return true;
 }
@@ -1731,25 +1731,25 @@ void VID_LockBuffer(void)
    if (memdc)
    {
       // Update surface pointer for linear access modes
-      display.buffer = display.conbuffer = display.direct = memdc->surface;
-      display.rowbytes = display.conrowbytes = memdc->mi.bytesPerLine;
+      video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = memdc->surface;
+      video_state.rowbytes = video_state.conrowbytes = memdc->mi.bytesPerLine;
    }
    else if (mgldc)
    {
       // Update surface pointer for linear access modes
-      display.buffer = display.conbuffer = display.direct = mgldc->surface;
-      display.rowbytes = display.conrowbytes = mgldc->mi.bytesPerLine;
+      video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = mgldc->surface;
+      video_state.rowbytes = video_state.conrowbytes = mgldc->mi.bytesPerLine;
    }
 
    if (r_dowarp)
       d_viewbuffer = r_warpbuffer;
    else
-      d_viewbuffer = (void*)(byte*)display.buffer;
+      d_viewbuffer = (void*)(byte*)video_state.frame_buffer;
 
    if (r_dowarp)
       screenwidth = WARP_WIDTH;
    else
-      screenwidth = display.rowbytes;
+      screenwidth = video_state.rowbytes;
 
    if (lcd_x.value)
       screenwidth <<= 1;
@@ -1772,7 +1772,7 @@ void VID_UnlockBuffer(void)
    MGL_endDirectAccess();
 
    // to turn up any unlocked accesses
-   display.buffer = display.conbuffer = display.direct = d_viewbuffer = NULL;
+   video_state.frame_buffer = video_state.frame_buffer_console = video_state.frame_buffer_direct = d_viewbuffer = NULL;
 
 }
 
@@ -2108,10 +2108,10 @@ void	VID_Init(unsigned char* palette)
       VID_InitFullDIB(global_hInstance);
    }
 
-   display.maxwarpwidth = WARP_WIDTH;
-   display.maxwarpheight = WARP_HEIGHT;
-   display.colormap = pHostColorMap;
-   display.fullbright = 256 - LittleLong(*((int*)display.colormap + 2048));
+   video_state.maxwarpwidth = WARP_WIDTH;
+   video_state.maxwarpheight = WARP_HEIGHT;
+   video_state.colormap = pColorMap;
+   video_state.fullbright = 256 - LittleLong(*((int*)video_state.colormap + 2048));
    vid_testingmode = 0;
 
    // GDI doesn't let us remap palette index 0, so we'll remap color
@@ -2136,7 +2136,7 @@ void	VID_Init(unsigned char* palette)
       }
    }
 
-   for (i = 0, ptmp = display.colormap; i < (1 << (VID_CBITS + 8)); i++, ptmp++)
+   for (i = 0, ptmp = video_state.colormap; i < (1 << (VID_CBITS + 8)); i++, ptmp++)
    {
       if (*ptmp == 0)
          *ptmp = bestmatch;
@@ -2148,6 +2148,7 @@ void	VID_Init(unsigned char* palette)
       vid_default = windowed_default;
    }
 
+   // Remove the loading dialog that shows when the game starts
    if (hwnd_dialog)
       DestroyWindow(hwnd_dialog);
 
@@ -2255,11 +2256,11 @@ void FlipScreen(vrect_t* rects)
             }
          }
 
-         if (display.numpages > 1)
+         if (video_state.numpages > 1)
          {
             // We have a flipping surface, so do a hard page flip
-            aPage = (aPage + 1) % display.numpages;
-            vPage = (vPage + 1) % display.numpages;
+            aPage = (aPage + 1) % video_state.numpages;
+            vPage = (vPage + 1) % video_state.numpages;
             MGL_setActivePage(mgldc, aPage);
             MGL_setVisualPage(mgldc, vPage, waitVRT);
          }
@@ -2313,8 +2314,8 @@ void	VID_Update(vrect_t* rects)
       palette_changed = false;
       rect.x = 0;
       rect.y = 0;
-      rect.width = display.width;
-      rect.height = display.height;
+      rect.width = video_state.width;
+      rect.height = video_state.height;
       rect.pnext = NULL;
       rects = &rect;
    }
@@ -2420,7 +2421,7 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height)
    if (!vid_initialized)
       return;
 
-   if (display.aspect > 1.5)
+   if (video_state.aspect > 1.5)
    {
       reps = 2;
       repshift = 1;
@@ -2431,21 +2432,21 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height)
       repshift = 0;
    }
 
-   if (display.numpages == 1)
+   if (video_state.numpages == 1)
    {
       VID_LockBuffer();
 
-      if (!display.direct)
-         Sys_Error("NULL display.direct pointer");
+      if (!video_state.frame_buffer_direct)
+         Sys_Error("NULL video_state.direct pointer");
 
       for (i = 0; i < (height << repshift); i += reps)
       {
          for (j = 0; j < reps; j++)
          {
             memcpy(&backingbuf[(i + j) * 24],
-               display.direct + x + ((y << repshift) + i + j) * display.rowbytes,
+               video_state.frame_buffer_direct + x + ((y << repshift) + i + j) * video_state.rowbytes,
                width);
-            memcpy(display.direct + x + ((y << repshift) + i + j) * display.rowbytes,
+            memcpy(video_state.frame_buffer_direct + x + ((y << repshift) + i + j) * video_state.rowbytes,
                &pbitmap[(i >> repshift) * width],
                width);
          }
@@ -2515,7 +2516,7 @@ void D_EndDirectRect(int x, int y, int width, int height)
    if (!vid_initialized)
       return;
 
-   if (display.aspect > 1.5)
+   if (video_state.aspect > 1.5)
    {
       reps = 2;
       repshift = 1;
@@ -2526,18 +2527,18 @@ void D_EndDirectRect(int x, int y, int width, int height)
       repshift = 0;
    }
 
-   if (display.numpages == 1)
+   if (video_state.numpages == 1)
    {
       VID_LockBuffer();
 
-      if (!display.direct)
-         Sys_Error("NULL display.direct pointer");
+      if (!video_state.frame_buffer_direct)
+         Sys_Error("NULL video_state.direct pointer");
 
       for (i = 0; i < (height << repshift); i += reps)
       {
          for (j = 0; j < reps; j++)
          {
-            memcpy(display.direct + x + ((y << repshift) + i + j) * display.rowbytes,
+            memcpy(video_state.frame_buffer_direct + x + ((y << repshift) + i + j) * video_state.rowbytes,
                &backingbuf[(i + j) * 24],
                width);
          }

@@ -303,7 +303,7 @@ qboolean V_CheckGamma(void)
    oldgammavalue = v_gamma.value;
 
    BuildGammaTable(v_gamma.value);
-   display.recalc_refdef = 1;				// force a surface cache flush
+   video_state.recalc_refdef = 1;				// force a surface cache flush
 
    return true;
 }
@@ -594,7 +594,7 @@ void V_UpdatePalette(void)
       ramps[2][i] = gammatable[ib];
    }
 
-   basepal = pHostBasePalette;
+   basepal = pBasePalette;
    newpal = pal;
 
    for (i = 0; i < 256; i++)
@@ -655,7 +655,7 @@ void V_UpdatePalette(void)
    if (!new && !force)
       return;
 
-   basepal = pHostBasePalette;
+   basepal = pBasePalette;
    newpal = pal;
 
    for (i = 0; i < 256; i++)
@@ -957,7 +957,7 @@ void V_CalcRefdef(void)
 
    view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
    view->frame = cl.stats[STAT_WEAPONFRAME];
-   view->colormap = display.colormap;
+   view->colormap = video_state.colormap;
 
    // set up the refresh position
    VectorAdd(r_refdef.viewangles, cl.punchangle, r_refdef.viewangles);
@@ -1029,15 +1029,15 @@ void V_RenderView(void)
       //
       int		i;
 
-      display.rowbytes <<= 1;
-      display.aspect *= 0.5;
+      video_state.rowbytes <<= 1;
+      video_state.aspect *= 0.5;
 
       r_refdef.viewangles[YAW] -= lcd_yaw.value;
       for (i = 0; i < 3; i++)
          r_refdef.vieworg[i] -= right[i] * lcd_x.value;
       R_RenderView();
 
-      display.buffer += display.rowbytes >> 1;
+      video_state.frame_buffer += video_state.rowbytes >> 1;
 
       R_PushDlights();
 
@@ -1046,12 +1046,12 @@ void V_RenderView(void)
          r_refdef.vieworg[i] += 2 * right[i] * lcd_x.value;
       R_RenderView();
 
-      display.buffer -= display.rowbytes >> 1;
+      video_state.frame_buffer -= video_state.rowbytes >> 1;
 
       r_refdef.vrect.height <<= 1;
 
-      display.rowbytes >>= 1;
-      display.aspect *= 2;
+      video_state.rowbytes >>= 1;
+      video_state.aspect *= 2;
    }
    else
    {

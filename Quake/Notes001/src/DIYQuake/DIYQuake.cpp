@@ -8,5 +8,5 @@ int main(int argc, char *argv[])
 {
 	System system;
 	system.Init();
-	return 0;
+	return 1;
 }

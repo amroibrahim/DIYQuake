@@ -51,8 +51,8 @@ client_t* host_client;			// current client
 
 jmp_buf 	host_abortserver;
 
-byte* pHostBasePalette;
-byte* pHostColorMap;
+byte* pBasePalette;
+byte* pColorMap;
 
 cvar_t	host_framerate = { "host_framerate","0" };	// set for slow motion
 cvar_t	host_speeds = { "host_speeds","0" };			// set for running times
@@ -874,17 +874,17 @@ void Host_Init(quakeparms_t* parms)
 
    if (cls.state != ca_dedicated)
    {
-      pHostBasePalette = (byte*)COM_LoadHunkFile("gfx/palette.lmp");
-      if (!pHostBasePalette)
+      pBasePalette = (byte*)COM_LoadHunkFile("gfx/palette.lmp");
+      if (!pBasePalette)
          Sys_Error("Couldn't load gfx/palette.lmp");
-      pHostColorMap = (byte*)COM_LoadHunkFile("gfx/colormap.lmp");
-      if (!pHostColorMap)
+      pColorMap = (byte*)COM_LoadHunkFile("gfx/colormap.lmp");
+      if (!pColorMap)
          Sys_Error("Couldn't load gfx/colormap.lmp");
 
 #ifndef _WIN32 // on non win32, mouse comes before video for security reasons
       IN_Init();
 #endif
-      VID_Init(pHostBasePalette);
+      VID_Init(pBasePalette);
 
       Draw_Init();
       SCR_Init();

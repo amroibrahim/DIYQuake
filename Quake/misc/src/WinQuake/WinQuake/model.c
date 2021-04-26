@@ -291,6 +291,7 @@ model_t* Mod_LoadModel(model_t* mod, qboolean crash)
    //
    // allocate a new model
    //
+   // AngryCPPCoder: Extract the file name (remove path and extention)
    COM_FileBase(mod->name, loadname);
 
    loadmodel = mod;

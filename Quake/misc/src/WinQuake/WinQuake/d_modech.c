@@ -63,14 +63,14 @@ void D_ViewChanged(void)
    if (r_dowarp)
       rowbytes = WARP_WIDTH;
    else
-      rowbytes = display.rowbytes;
+      rowbytes = video_state.rowbytes;
 
    scale_for_mip = xscale;
    if (yscale > xscale)
       scale_for_mip = yscale;
 
-   d_zrowbytes = display.width * 2;
-   d_zwidth = display.width;
+   d_zrowbytes = video_state.width * 2;
+   d_zwidth = video_state.width;
 
    d_pix_min = r_refdef.vrect.width / 320;
    if (d_pix_min < 1)
@@ -95,7 +95,7 @@ void D_ViewChanged(void)
    {
       int		i;
 
-      for (i = 0; i < display.height; i++)
+      for (i = 0; i < video_state.height; i++)
       {
          d_scantable[i] = i * rowbytes;
          zspantable[i] = d_pzbuffer + i * d_zwidth;

@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 
 
-int			sb_updates;		// if >= display.numpages, no update needed
+int			sb_updates;		// if >= video_state.numpages, no update needed
 
 #define STAT_MINUS		10	// num frame for '-' stats digit
 qpic_t* sb_nums[2][11];
@@ -260,9 +260,9 @@ Sbar_DrawPic
 void Sbar_DrawPic(int x, int y, qpic_t* pic)
 {
    if (cl.gametype == GAME_DEATHMATCH)
-      Draw_Pic(x /* + ((display.width - 320)>>1)*/, y + (display.height - SBAR_HEIGHT), pic);
+      Draw_Pic(x /* + ((video_state.width - 320)>>1)*/, y + (video_state.height - SBAR_HEIGHT), pic);
    else
-      Draw_Pic(x + ((display.width - 320) >> 1), y + (display.height - SBAR_HEIGHT), pic);
+      Draw_Pic(x + ((video_state.width - 320) >> 1), y + (video_state.height - SBAR_HEIGHT), pic);
 }
 
 /*
@@ -273,9 +273,9 @@ Sbar_DrawTransPic
 void Sbar_DrawTransPic(int x, int y, qpic_t* pic)
 {
    if (cl.gametype == GAME_DEATHMATCH)
-      Draw_TransPic(x /*+ ((display.width - 320)>>1)*/, y + (display.height - SBAR_HEIGHT), pic);
+      Draw_TransPic(x /*+ ((video_state.width - 320)>>1)*/, y + (video_state.height - SBAR_HEIGHT), pic);
    else
-      Draw_TransPic(x + ((display.width - 320) >> 1), y + (display.height - SBAR_HEIGHT), pic);
+      Draw_TransPic(x + ((video_state.width - 320) >> 1), y + (video_state.height - SBAR_HEIGHT), pic);
 }
 
 /*
@@ -288,9 +288,9 @@ Draws one solid graphics character
 void Sbar_DrawCharacter(int x, int y, int num)
 {
    if (cl.gametype == GAME_DEATHMATCH)
-      Draw_Character(x /*+ ((display.width - 320)>>1) */ + 4, y + display.height - SBAR_HEIGHT, num);
+      Draw_Character(x /*+ ((video_state.width - 320)>>1) */ + 4, y + video_state.height - SBAR_HEIGHT, num);
    else
-      Draw_Character(x + ((display.width - 320) >> 1) + 4, y + display.height - SBAR_HEIGHT, num);
+      Draw_Character(x + ((video_state.width - 320) >> 1) + 4, y + video_state.height - SBAR_HEIGHT, num);
 }
 
 /*
@@ -301,9 +301,9 @@ Sbar_DrawString
 void Sbar_DrawString(int x, int y, char* str)
 {
    if (cl.gametype == GAME_DEATHMATCH)
-      Draw_String(x /*+ ((display.width - 320)>>1)*/, y + display.height - SBAR_HEIGHT, str);
+      Draw_String(x /*+ ((video_state.width - 320)>>1)*/, y + video_state.height - SBAR_HEIGHT, str);
    else
-      Draw_String(x + ((display.width - 320) >> 1), y + display.height - SBAR_HEIGHT, str);
+      Draw_String(x + ((video_state.width - 320) >> 1), y + video_state.height - SBAR_HEIGHT, str);
 }
 
 /*
@@ -521,8 +521,8 @@ void Sbar_DrawScoreboard(void)
       top = Sbar_ColorForMap(top);
       bottom = Sbar_ColorForMap(bottom);
 
-      Draw_Fill(x * 8 + 10 + ((display.width - 320) >> 1), y + display.height - SBAR_HEIGHT, 28, 4, top);
-      Draw_Fill(x * 8 + 10 + ((display.width - 320) >> 1), y + 4 + display.height - SBAR_HEIGHT, 28, 4, bottom);
+      Draw_Fill(x * 8 + 10 + ((video_state.width - 320) >> 1), y + video_state.height - SBAR_HEIGHT, 28, 4, top);
+      Draw_Fill(x * 8 + 10 + ((video_state.width - 320) >> 1), y + 4 + video_state.height - SBAR_HEIGHT, 28, 4, bottom);
 
       // draw text
       for (j = 0; j < 20; j++)
@@ -781,8 +781,8 @@ void Sbar_DrawFrags(void)
    if (cl.gametype == GAME_DEATHMATCH)
       xofs = 0;
    else
-      xofs = (display.width - 320) >> 1;
-   y = display.height - SBAR_HEIGHT - 23;
+      xofs = (video_state.width - 320) >> 1;
+   y = video_state.height - SBAR_HEIGHT - 23;
 
    for (i = 0; i < l; i++)
    {
@@ -851,11 +851,11 @@ void Sbar_DrawFace(void)
       if (cl.gametype == GAME_DEATHMATCH)
          xofs = 113;
       else
-         xofs = ((display.width - 320) >> 1) + 113;
+         xofs = ((video_state.width - 320) >> 1) + 113;
 
       Sbar_DrawPic(112, 0, rsb_teambord);
-      Draw_Fill(xofs, display.height - SBAR_HEIGHT + 3, 22, 9, top);
-      Draw_Fill(xofs, display.height - SBAR_HEIGHT + 12, 22, 9, bottom);
+      Draw_Fill(xofs, video_state.height - SBAR_HEIGHT + 3, 22, 9, top);
+      Draw_Fill(xofs, video_state.height - SBAR_HEIGHT + 12, 22, 9, bottom);
 
       // draw number
       f = s->frags;
@@ -925,18 +925,18 @@ Sbar_Draw
 */
 void Sbar_Draw(void)
 {
-   if (scr_con_current == display.height)
+   if (scr_con_current == video_state.height)
       return;		// console is full screen
 
-   if (sb_updates >= display.numpages)
+   if (sb_updates >= video_state.numpages)
       return;
 
    scr_copyeverything = 1;
 
    sb_updates++;
 
-   if (sb_lines && display.width > 320)
-      Draw_TileClear(0, display.height - sb_lines, display.width, sb_lines);
+   if (sb_lines && video_state.width > 320)
+      Draw_TileClear(0, video_state.height - sb_lines, video_state.width, sb_lines);
 
    if (sb_lines > 24)
    {
@@ -1037,7 +1037,7 @@ void Sbar_Draw(void)
          cl.stats[STAT_AMMO] <= 10);
    }
 
-   if (display.width > 320) {
+   if (video_state.width > 320) {
       if (cl.gametype == GAME_DEATHMATCH)
          Sbar_MiniDeathmatchOverlay();
    }
@@ -1104,7 +1104,7 @@ void Sbar_DeathmatchOverlay(void)
    // draw the text
    l = scoreboardlines;
 
-   x = 80 + ((display.width - 320) >> 1);
+   x = 80 + ((video_state.width - 320) >> 1);
    y = 40;
    for (i = 0; i < l; i++)
    {
@@ -1174,7 +1174,7 @@ void Sbar_MiniDeathmatchOverlay(void)
    scoreboard_t* s;
    int				numlines;
 
-   if (display.width < 512 || !sb_lines)
+   if (video_state.width < 512 || !sb_lines)
       return;
 
    scr_copyeverything = 1;
@@ -1185,7 +1185,7 @@ void Sbar_MiniDeathmatchOverlay(void)
 
    // draw the text
    l = scoreboardlines;
-   y = display.height - sb_lines;
+   y = video_state.height - sb_lines;
    numlines = sb_lines / 8;
    if (numlines < 3)
       return;
@@ -1206,7 +1206,7 @@ void Sbar_MiniDeathmatchOverlay(void)
       i = 0;
 
    x = 324;
-   for (/* */; i < scoreboardlines && y < display.height - 8; i++)
+   for (/* */; i < scoreboardlines && y < video_state.height - 8; i++)
    {
       k = fragsort[i];
       s = &cl.scores[k];
@@ -1319,5 +1319,5 @@ void Sbar_FinaleOverlay(void)
    scr_copyeverything = 1;
 
    pic = Draw_CachePic("gfx/finale.lmp");
-   Draw_TransPic((display.width - pic->width) / 2, 16, pic);
+   Draw_TransPic((video_state.width - pic->width) / 2, 16, pic);
 }

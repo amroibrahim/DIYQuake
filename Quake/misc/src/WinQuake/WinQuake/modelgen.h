@@ -76,12 +76,14 @@ typedef struct {
 
 // TODO: could be shorts
 
+// AngryCPPCoder: Texture Cordinates
 typedef struct {
    int		onseam;
    int		s;
    int		t;
 } stvert_t;
 
+// AngryCPPCoder: Triangle Vertics (index into trivertx_t)
 typedef struct dtriangle_s {
    int					facesfront;
    int					vertindex[3];
@@ -92,6 +94,7 @@ typedef struct dtriangle_s {
 // This mirrors trivert_t in trilib.h, is present so Quake knows how to
 // load this data
 
+// AngryCPPCoder: Vertices array
 typedef struct {
    byte	v[3];
    byte	lightnormalindex;

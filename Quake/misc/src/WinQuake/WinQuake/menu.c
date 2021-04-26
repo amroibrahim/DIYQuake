@@ -111,7 +111,7 @@ Draws one solid graphics character
 */
 void M_DrawCharacter(int cx, int line, int num)
 {
-   Draw_Character(cx + ((display.width - 320) >> 1), line, num);
+   Draw_Character(cx + ((video_state.width - 320) >> 1), line, num);
 }
 
 void M_Print(int cx, int cy, char* str)
@@ -136,12 +136,12 @@ void M_PrintWhite(int cx, int cy, char* str)
 
 void M_DrawTransPic(int x, int y, qpic_t* pic)
 {
-   Draw_TransPic(x + ((display.width - 320) >> 1), y, pic);
+   Draw_TransPic(x + ((video_state.width - 320) >> 1), y, pic);
 }
 
 void M_DrawPic(int x, int y, qpic_t* pic)
 {
-   Draw_Pic(x + ((display.width - 320) >> 1), y, pic);
+   Draw_Pic(x + ((video_state.width - 320) >> 1), y, pic);
 }
 
 byte identityTable[256];
@@ -174,7 +174,7 @@ void M_BuildTranslationTable(int top, int bottom)
 
 void M_DrawTransPicTranslate(int x, int y, qpic_t* pic)
 {
-   Draw_TransPicTranslate(x + ((display.width - 320) >> 1), y, pic, translationTable);
+   Draw_TransPicTranslate(x + ((video_state.width - 320) >> 1), y, pic, translationTable);
 }
 
 
@@ -3029,7 +3029,7 @@ void M_Draw(void)
 
       if (scr_con_current)
       {
-         Draw_ConsoleBackground(display.height);
+         Draw_ConsoleBackground(video_state.height);
          VID_UnlockBuffer();
          S_ExtraUpdate();
          VID_LockBuffer();

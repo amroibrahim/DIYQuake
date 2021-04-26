@@ -84,7 +84,7 @@ entity_t* CL_EntityNum(int num)
          Host_Error("CL_EntityNum: %i is an invalid number", num);
       while (cl.num_entities <= num)
       {
-         ClientEntities[cl.num_entities].colormap = display.colormap;
+         ClientEntities[cl.num_entities].colormap = video_state.colormap;
          cl.num_entities++;
       }
    }
@@ -407,7 +407,7 @@ void CL_ParseUpdate(int bits)
    else
       i = ent->baseline.colormap;
    if (!i)
-      ent->colormap = display.colormap;
+      ent->colormap = video_state.colormap;
    else
    {
       if (i > cl.maxclients)
@@ -636,8 +636,8 @@ void CL_NewTranslation(int slot)
    if (slot > cl.maxclients)
       Sys_Error("CL_NewTranslation: slot > cl.maxclients");
    dest = cl.scores[slot].translations;
-   source = display.colormap;
-   memcpy(dest, display.colormap, sizeof(cl.scores[slot].translations));
+   source = video_state.colormap;
+   memcpy(dest, video_state.colormap, sizeof(cl.scores[slot].translations));
    top = cl.scores[slot].colors & 0xf0;
    bottom = (cl.scores[slot].colors & 15) << 4;
 #ifdef GLQUAKE
@@ -680,7 +680,7 @@ void CL_ParseStatic(void)
    // copy it to the current state
    ent->model = cl.model_precache[ent->baseline.modelindex];
    ent->frame = ent->baseline.frame;
-   ent->colormap = display.colormap;
+   ent->colormap = video_state.colormap;
    ent->skinnum = ent->baseline.skin;
    ent->effects = ent->baseline.effects;
 
@@ -807,7 +807,7 @@ void CL_ParseServerMessage(void)
 
       case svc_serverinfo:
          CL_ParseServerInfo();
-         display.recalc_refdef = true;	// leave intermission full screen
+         video_state.recalc_refdef = true;	// leave intermission full screen
          break;
 
       case svc_setangle:
@@ -937,20 +937,20 @@ void CL_ParseServerMessage(void)
       case svc_intermission:
          cl.intermission = 1;
          cl.completed_time = cl.time;
-         display.recalc_refdef = true;	// go to full screen
+         video_state.recalc_refdef = true;	// go to full screen
          break;
 
       case svc_finale:
          cl.intermission = 2;
          cl.completed_time = cl.time;
-         display.recalc_refdef = true;	// go to full screen
+         video_state.recalc_refdef = true;	// go to full screen
          SCR_CenterPrint(MSG_ReadString());
          break;
 
       case svc_cutscene:
          cl.intermission = 3;
          cl.completed_time = cl.time;
-         display.recalc_refdef = true;	// go to full screen
+         video_state.recalc_refdef = true;	// go to full screen
          SCR_CenterPrint(MSG_ReadString());
          break;
 
