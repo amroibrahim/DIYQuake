@@ -102,7 +102,12 @@ byte *COM_LoadFile (char *path, int usehunk)
     return buf; // return the loaded file in memory.
 }
 ```
-So based on the int being passed a diffrent section of hunk memory will be used.  
+So based on the int being passed a different section of hunk memory will be used.  
+
+The palette file format is simple, just a sequence of bytes, 24-bits for each color in the palette, broken down to a byte each for red, green, and blue, and each color id is the index as it show in the file.
+
+![palette format](./img/palette_format.png)  
+
 At this point we have the file loaded, but we have not created or can draw any thing on the screen yet! Let us have a look at how the main game window is created and how pixels are drawn on the screen.  
 
 ## Video
