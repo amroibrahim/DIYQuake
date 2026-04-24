@@ -72,7 +72,8 @@ First things first! The first 4 bytes in the header is the identifier, which can
 
 ``` cpp
 #define IDPOLYHEADER    (('O'<<24)+('P'<<16)+('D'<<8)+'I')
-// (('O'<<24)+('P'<<16)+('D'<<8)+'I') == (char*) "IDPO" == (int) 1229213775 == (hex) 0x4944504f
+// (('O'<<24)+('P'<<16)+('D'<<8)+'I') == 1330660425 == 0x4f504449 (little-endian int form of "IDPO")
+// "IDPO" as big-endian bytes is 0x4944504f == 1229213775
 ```
 
 If you wonder if there is any benefit of casting the ```ident``` to an int, the answer is yes! Let's look at the generated assembly code, comparing it as char[4] and an int  
@@ -183,7 +184,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
    int           i;
    mdl_t         *pmodel, *pinmodel;
    stvert_t      *pstverts, *pinstverts;
-   aliashdr_t    pheader; // New header is created to track where is data in memory
+   aliashdr_t    *pheader; // New header is created to track where is data in memory
    mtriangle_t   *ptri;
    dtriangle_t   *pintriangles;
    int           version, numframes, numskins;

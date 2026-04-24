@@ -315,7 +315,7 @@ Pack* Common::LoadPackFile(string& sPackFileName)
    m_pSystem->FileRead(iPAKFileHandleIndex, &header, sizeof(PackHeader), 1);
 
    //Validate PAK file header
-   if (header.ID[0] != 'P' && header.ID[1] != 'A' && header.ID[2] != 'C' && header.ID[3] != 'K')
+   if (header.ID[0] != 'P' || header.ID[1] != 'A' || header.ID[2] != 'C' || header.ID[3] != 'K')
    {
       return nullptr;
    }
