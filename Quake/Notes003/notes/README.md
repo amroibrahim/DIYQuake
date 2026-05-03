@@ -227,6 +227,7 @@ Create the structures required to hold the data as discusses in the notes
 #define MAX_PATH_LENGTH 128
 #define MAX_PACK_NAME 64 
 #define MAX_PACK_NAME_DISK 56
+#define MAX_FILES_IN_PACK 2048
 
 struct PackFile
 {
@@ -314,29 +315,46 @@ Pack* Common::LoadPackFile(string& sPackFileName)
    // Read Pack header
    m_pSystem->FileRead(iPAKFileHandleIndex, &header, sizeof(PackHeader), 1);
 
-   //Validate PAK file header
+   // Validate PAK file header
    if (header.ID[0] != 'P' || header.ID[1] != 'A' || header.ID[2] != 'C' || header.ID[3] != 'K')
    {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
       return nullptr;
    }
 
-   // Calculate the number of files
-   int iFilesCount = header.iDirectoryLength / sizeof(PackFileOnDisk);
+   // Validate the directory length before trusting it as a count.
+   // header.iDirectoryLength comes straight from disk and could be bogus.
+   if (header.iDirectoryLength <= 0 ||
+       header.iDirectoryLength % sizeof(PackFileOnDisk) != 0)
+   {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
+      return nullptr;
+   }
 
-   // I don't feel okay putting a 2048 or size PackFileOnDisk on stack
-   PackFileOnDisk* pPackFileOnDisk = new PackFileOnDisk[2048];
+   int iFilesCount = header.iDirectoryLength / sizeof(PackFileOnDisk);
+   if (iFilesCount > MAX_FILES_IN_PACK)
+   {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
+      return nullptr;
+   }
+
+   // Temp buffer for the on-disk directory; vector frees itself on every return path.
+   std::vector<PackFileOnDisk> vPackFileOnDisk(iFilesCount);
 
    // Allocate memory for the file directory array
    PackFile* pFiles = (PackFile*)m_pMemorymanager->NewLowEndNamed(iFilesCount * sizeof(PackFile), sHunkPackFiles);
    m_pSystem->FileSeek(iPAKFileHandleIndex, header.iDirectoryOffset);
-   m_pSystem->FileRead(iPAKFileHandleIndex, pPackFileOnDisk, header.iDirectoryLength, 1);
+   m_pSystem->FileRead(iPAKFileHandleIndex, vPackFileOnDisk.data(), header.iDirectoryLength, 1);
 
    // Copy the needed data
    for (int i = 0; i < iFilesCount; i++)
    {
-      strcpy(pFiles[i].szName, pPackFileOnDisk[i].szName);
-      pFiles[i].iFileOffset = pPackFileOnDisk[i].iFileOffset;
-      pFiles[i].iFileSize = pPackFileOnDisk[i].iFileSize;
+      // Force a terminator: on-disk names are zero-padded to 56 bytes, but a
+      // malformed pack could omit it. szName is 64 bytes so this fits.
+      strncpy(pFiles[i].szName, vPackFileOnDisk[i].szName, MAX_PACK_NAME_DISK);
+      pFiles[i].szName[MAX_PACK_NAME_DISK] = '\0';
+      pFiles[i].iFileOffset = vPackFileOnDisk[i].iFileOffset;
+      pFiles[i].iFileSize = vPackFileOnDisk[i].iFileSize;
    }
 
    Pack* pPack = (Pack*)m_pMemorymanager->NewLowEnd(sizeof(Pack));
@@ -349,6 +367,23 @@ Pack* Common::LoadPackFile(string& sPackFileName)
 }
 
 ```
+
+Note: the function looks more defensive than it might at first appear, and there is a reason for every check. The PAK header is data we read straight from disk, so we cannot trust any of it. The original Quake makes the same assumption, and bails out with ```Sys_Error``` if a PAK has more than ```MAX_FILES_IN_PACK``` (2048) entries. We use the same constant value so we don't artificially reject any PAK that the original engine would have accepted.
+
+```cpp
+// from id Software's common.c
+#define MAX_FILES_IN_PACK   2048
+...
+if (numpackfiles > MAX_FILES_IN_PACK)
+   Sys_Error ("%s has %i files", packfile, numpackfiles);
+```
+
+A few details worth calling out about the early-return paths:
+
+* If the magic bytes are wrong, we have to call ```FileClose``` before returning. ```FileOpen``` already grabbed a slot in our handle array and a ```SDL_RWops*```; bailing out without closing leaks both, and you only have ```MAX_FILE_HANDLES``` of them.
+* We reject negative or non-multiple-of-entry-size directory lengths up front. Without that check, a malformed file could give us a negative or absurdly large ```iFilesCount```.
+* For the temp directory buffer I used a ```std::vector<PackFileOnDisk>``` sized to the validated ```iFilesCount```. The original Quake puts that array on the stack as ```dpackfile_t info[MAX_FILES_IN_PACK]``` (~128 KB), which works in DOS/Win9x where the stack was sized accordingly, but is wasteful in the general case. Vector also frees itself automatically, so even if I add another early-return path later I won't leak.
+* The name copy uses ```strncpy``` plus an explicit terminator, instead of ```strcpy```. Quake's tooling always zero-pads PAK entry names to 56 bytes, but a hand-rolled or corrupt PAK might not.
 
 Make sure we update the common initialization function to call ```AddGameDirectory```
 

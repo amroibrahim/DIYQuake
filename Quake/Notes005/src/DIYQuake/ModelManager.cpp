@@ -18,9 +18,12 @@ void ModelManager::Init(MemoryManager* pMemorymanager, Common* pCommon)
 
 ModelData* ModelManager::Load(char* szName)
 {
-   ModelData* pModelData = nullptr;
-
-   pModelData = Find(szName);
+   ModelData* pModelData = Find(szName);
+   
+   if (!pModelData)
+   {
+      return nullptr;
+   }  
 
    return Load(pModelData);
 }
@@ -29,6 +32,11 @@ ModelData* ModelManager::Load(char* szName)
 void ModelManager::LoadHeader(char* szName)
 {
    ModelData* pModelData = Find(szName);
+   
+   if (!pModelData)
+   {
+      return;
+   }   
 
    if (pModelData->eLoadStatus == MODELLOADSTATUS::PRESENT)
    {
@@ -134,6 +142,12 @@ ModelData* ModelManager::Find(char* szName)
             {
                m_pMemorymanager->CacheEvict(&pCurrentModel->pCachData);
             }
+         }
+         else
+         {
+            // Registry is full and nothing can be recycled.
+            // Original Quake: Sys_Error("mod_numknown == MAX_MOD_KNOWN")
+            return nullptr;
          }
       }
       else

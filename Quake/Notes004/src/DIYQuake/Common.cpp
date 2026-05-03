@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -175,23 +176,41 @@ Pack* Common::LoadPackFile(string& sPackFileName)
    //Validate PAK file header
    if (header.ID[0] != 'P' || header.ID[1] != 'A' || header.ID[2] != 'C' || header.ID[3] != 'K')
    {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
+      return nullptr;
+   }
+
+   // Validate the directory length before trusting it as a count.
+   // header.iDirectoryLength comes straight from disk and could be bogus.
+   if (header.iDirectoryLength <= 0 ||
+       header.iDirectoryLength % sizeof(PackFileOnDisk) != 0)
+   {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
       return nullptr;
    }
 
    int iFilesCount = header.iDirectoryLength / sizeof(PackFileOnDisk);
+   if (iFilesCount > MAX_FILES_IN_PACK)
+   {
+      m_pSystem->FileClose(iPAKFileHandleIndex);
+      return nullptr;
+   }
 
-   // I don't feel okay putting a 2048 or size PackFileOnDisk on stack
-   PackFileOnDisk* pPackFileOnDisk = new PackFileOnDisk[2048];
+   // Temp buffer for the on-disk directory; vector frees itself on every return path.
+   std::vector<PackFileOnDisk> vPackFileOnDisk(iFilesCount);
 
    PackFile* pFiles = (PackFile*)m_pMemorymanager->NewLowEndNamed(iFilesCount * sizeof(PackFile), sHunkPackFiles);
    m_pSystem->FileSeek(iPAKFileHandleIndex, header.iDirectoryOffset);
-   m_pSystem->FileRead(iPAKFileHandleIndex, pPackFileOnDisk, header.iDirectoryLength);
+   m_pSystem->FileRead(iPAKFileHandleIndex, vPackFileOnDisk.data(), header.iDirectoryLength);
 
    for (int i = 0; i < iFilesCount; i++)
    {
-      strcpy(pFiles[i].szName, pPackFileOnDisk[i].szName);
-      pFiles[i].iFileOffset = pPackFileOnDisk[i].iFileOffset;
-      pFiles[i].iFileSize = pPackFileOnDisk[i].iFileSize;
+      // Force a terminator: on-disk names are zero-padded to 56 bytes, but a
+      // malformed pack could omit it. szName is 64 bytes so this fits.
+      strncpy(pFiles[i].szName, vPackFileOnDisk[i].szName, MAX_PACK_NAME_DISK);
+      pFiles[i].szName[MAX_PACK_NAME_DISK] = '\0';
+      pFiles[i].iFileOffset = vPackFileOnDisk[i].iFileOffset;
+      pFiles[i].iFileSize = vPackFileOnDisk[i].iFileSize;
    }
 
    Pack* pPack = (Pack*)m_pMemorymanager->NewLowEnd(sizeof(Pack));

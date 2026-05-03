@@ -7,7 +7,7 @@
 constexpr uint32_t MEMORY_16MB = 16 * 1024 * 1024;
 char szPaletteFileName[] = "gfx/palette.lmp";
 
-Host::Host()
+Host::Host() : m_pParameters(nullptr), m_pSystem(nullptr), dRealTime(0.0), dOldrealTime(0.0), dFrametime(0.0)
 {
 }
 

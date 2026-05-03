@@ -481,13 +481,13 @@ Finally let’s add the game loop and run.
 
 ``` cpp
    uint64_t OldTime, NewTime;
-   double dTime;
+   float dTime;
    OldTime = system.GetTime();
 
    while (system.GetIsRunning())
    {
       NewTime = system.GetTime();
-      dTime = (double)(NewTime - OldTime) / system.GetPerformanceFrequency();
+      dTime = (float)(NewTime - OldTime) / system.GetPerformanceFrequency();
       host.Frame(dTime);
       OldTime = NewTime;
    }

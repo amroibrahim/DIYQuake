@@ -9,6 +9,7 @@
 #define MAX_PATH_LENGTH 128
 #define MAX_PACK_NAME 64 
 #define MAX_PACK_NAME_DISK 56
+#define MAX_FILES_IN_PACK 2048
 
 struct PackFile
 {

@@ -350,11 +350,13 @@ public:
    void* NewLowEndNamed(int32_t iSize, std::string& sName); // Allocate low end, with name
    void* NewHighEndNamed(int32_t iSize, std::string& sName); // Allocate high end, with name
    void* NewTemp(int32_t iSize); // Create a temp hunk
+   void* Check(Cache::CacheData* pCacheData); // Check if cache data is still valid
 
    void DeleteTemp(); // Delete the temp hunk
    void DeleteToLowMark(int32_t LowMark); // Delete low end to the given low mark
    void DeleteToHighMark(int32_t HightMark); // Delete high end to the given low mark
    void HunkInit(HunkHeader* pHeader, const int32_t& iSize, std::string& sName); // Initialize a new hunk
+   void CacheEvict(Cache::CacheData* pCacheData); // Evict an entry from the cache
 
    int32_t Aligne(int32_t iSize, int32_t iAlignmentValue); // Align memory to a given number
    int32_t GetMemorySize(void); // Return memory size (16MB)

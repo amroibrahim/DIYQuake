@@ -6,7 +6,7 @@
 
 constexpr uint32_t MEMORY_16MB = 16 * 1024 * 1024;
 
-Host::Host()
+Host::Host() : m_pParameters(nullptr)
 {
 }
 

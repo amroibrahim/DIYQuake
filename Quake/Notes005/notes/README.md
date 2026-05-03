@@ -459,6 +459,9 @@ struct AliasModelHeader
 class ModelManager
 {
 public:
+   ModelManager();
+   ~ModelManager();
+
    void Init(MemoryManager* pMemorymanager, Common* pCommon);
    void LoadHeader(char* szName); 
 
@@ -483,6 +486,22 @@ protected:
    int32_t m_iKnownModelCount;
 };
 ```
+
+Note: ```ModelManager``` is held by value inside ```Host```, and its members are plain-old-data (the count, the array of ```ModelData```, the two pointers). If we relied on the implicit default constructor, those members would be left with indeterminate values — and ```Find``` uses ```m_iKnownModelCount``` immediately as a loop bound, so a garbage value could either crash on the first ```strcmp``` against an uninitialized ```szName``` or silently "find" the wrong slot. Adding an explicit constructor that zero-initializes everything is the fix:
+
+``` cpp
+ModelManager::ModelManager()
+   : m_pMemorymanager(nullptr)
+   , m_pCommon(nullptr)
+   , m_iKnownModelCount(0)
+   , m_pKnownModels{}
+{
+}
+```
+
+This mirrors how Quake's ```mod_known``` array is zero-filled by virtue of being in static storage — same effect, different mechanism.
+
+One more detail in ```Find``` that's worth knowing about. When the registry is full (```m_iKnownModelCount == MAX_KNOWN_MODEL```) and there's also no ```UNREFERENCED``` slot we can recycle, we have to bail out instead of writing into the next would-be slot, which is one element past the end of the array. Original Quake calls ```Sys_Error("mod_numknown == MAX_MOD_KNOWN")``` in this case; in DIYQuake we just return ```nullptr``` and let the caller deal with it (and the caller of ```Find``` checks for null before dereferencing).
 
 To stick to what Quake code does I created a render and a Screen class, the render doesn't do much exept drawing the Skin/Texture on the screen.  
 
