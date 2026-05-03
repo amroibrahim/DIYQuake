@@ -2,6 +2,14 @@
 
 #include <string>
 
+ModelManager::ModelManager() : m_pMemorymanager(nullptr), m_pCommon(nullptr), m_iKnownModelCount(0), m_pKnownModels{}
+{
+}
+
+ModelManager::~ModelManager()
+{
+}
+
 void ModelManager::Init(MemoryManager* pMemorymanager, Common* pCommon)
 {
    m_pMemorymanager = pMemorymanager;
@@ -60,7 +68,7 @@ void ModelManager::LoadAliasModel(ModelData* pModel, byte_t* pBuffer, char* szHu
 
    AliasSkinDesc* pSkinDesc = (AliasSkinDesc*)m_pMemorymanager->NewLowEndNamed(iNumberOfSkins * sizeof(AliasSkinDesc), sloadName);
 
-   pAliasModelHeader->SkinDescOffset = (byte_t*)pSkinDesc - (byte_t*)pAliasModelHeader;
+   pAliasModelHeader->SkinDescOffset = static_cast<int32_t>((byte_t*)pSkinDesc - (byte_t*)pAliasModelHeader);
 
    for (int i = 0; i < iNumberOfSkins; i++)
    {
@@ -205,7 +213,7 @@ void* ModelManager::LoadAliasSkin(void* pTempModel, int32_t* pSkinOffset, int32_
    byte_t* pSkin = (byte_t*)m_pMemorymanager->NewLowEndNamed(iSkinSize, sHunkName);
    byte_t* pSkinInTemp = (byte_t*)pTempModel;
 
-   *pSkinOffset = (byte_t*)pSkin - (byte_t*)pHeader;
+   *pSkinOffset = static_cast<int32_t>((byte_t*)pSkin - (byte_t*)pHeader);
 
    memcpy(pSkin, pSkinInTemp, iSkinSize);
 

@@ -206,7 +206,7 @@ Pack* Common::LoadPackFile(string& sPackFileName)
 
 void Common::GetFileBaseName(char* szFileName, char* szBaseFileName)
 {
-   int iLen = strlen(szFileName);
+   size_t iLen = strlen(szFileName);
    char* pDot = szFileName + iLen - 1;
    while (szFileName < pDot && *pDot != '.')
    {
@@ -221,7 +221,7 @@ void Common::GetFileBaseName(char* szFileName, char* szBaseFileName)
 
    ++pStart;
 
-   int iCopyCount = pDot - pStart;
+   size_t iCopyCount = pDot - pStart;
    strncpy(szBaseFileName, pStart, iCopyCount);
 
    szBaseFileName[iCopyCount] = '\0';

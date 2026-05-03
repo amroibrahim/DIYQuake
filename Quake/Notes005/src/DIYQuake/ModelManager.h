@@ -9,6 +9,9 @@
 class ModelManager
 {
 public:
+   ModelManager();
+   ~ModelManager();
+
    void Init(MemoryManager* pMemorymanager, Common* pCommon);
    void LoadHeader(char* szName);
 
