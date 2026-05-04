@@ -4,24 +4,12 @@ So far, we were able to read the PAK file directory and now it is time to read a
 ## The Palette  
 In old days memory was a major factor on how games/applications are designed, systems where very limited with few MB of RAM. So, developers would cut memory consumption as much as possible to get their application running, and Quake was no exception. In games a lot of space (Memory/HDD) is consumed by the assets of the game. For an example, a texture (image) that is 640 pixels wide and 480 height making the total number of pixels in the image 307200 pixel, each pixel is represented in 3 colors, red, green, and blue with each color ranging from 0 to 255, we will need one byte per color making a total of 3 bytes for each pixel (3 x 8 = 24bit color depth). If you do the math 640 x 480 x 3 = 921600 = 900kb, that is a huge amount of memory. Here is a comparison table of different resolutions with multiple "color depth" configurations to have an idea how much memory is consumed.  
 
-| Resolution | Color Depth | Required memory |
-| ---------- | ----------- | --------------- |
-| 640*480 | 8-bit | 300 kb |
-| 640*480 | 16-bit | 600 kb | 
-| 640*480 | 24-bit | 900 kb |
-| 640*480 | 32-bit | 1200 kb |
-| 800*600 | 8-bit | 469 kb |
-| 800*600 | 16-bit | 937 kb |
-| 800*600 | 24-bit | 1,37 MB |
-| 800*600 | 32-bit | 1,83 MB |
-| 1024*768 | 8-bit | 768 kb |
-| 1024*768 | 16-bit | 1,5 MB |
-| 1024*768 | 24-bit | 2,25 MB |
-| 1024*768 | 32-bit | 3 MB |
-| 1280*1024 | 8-bit | 1,25 MB |
-| 1280*1024 | 16-bit | 2,5 MB |
-| 1280*1024 | 24-bit | 3,75 MB |
-| 1280*1024 | 32-bit | 5 MB |
+| Resolution | Required memory  8-bit Color Depth | Required memory  16-bit Color Depth | Required memory  24-bit Color Depth | Required memory  32-bit Color Depth |
+| ---------- | ---------------------------------- | ----------------------------------- | ----------------------------------- | ----------------------------------- |
+| 640*480    | 300 kb                             | 600 kb                              | 900 kb                              | 1200 kb                             |
+| 800*600    | 469 kb                             | 937 kb                              | 1,37 MB                             | 1,83 MB                             |
+| 1024*768   | 768 kb                             | 1,5 MB                              | 2,25 MB                             | 3 MB                                |
+| 1280*1024  | 1,25 MB                            | 2,5 MB                              | 3,75 MB                             | 5 MB                                |
 
 (__Note:__ Size in memory/storage is not the only problem, one other issue you would face can you update the texture in time to achieve target FPS, more data to copy means more time is needed, and one possible solution to save some memory is to lower the number of bytes (color depth) that will define the pixels colors.  
 
