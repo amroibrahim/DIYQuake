@@ -4,7 +4,7 @@ Contributors: [fluke](https://twitter.com/flukejones)
 Now that we have created a window to read and load the color palette, it is time to draw something on the screen. What is better than drawing Quake Ranger's skin (Quake main character texture)? But before we can do that, we have to understand models and how MDL files are formatted.  
 
 ## Goals
-* Understand what models are and their types is
+* Understand what models are and what their types are
 * MDL file format
 * How is an alias model skin loading
 * Code!
@@ -22,7 +22,7 @@ For now, we will focus on Alias Models.
 Alias models store data for the player character, enemies characters, and some pickups. The name "Alias" comes from the 3D modeling application [Alias PowerAnimator](https://en.wikipedia.org/wiki/PowerAnimator), which was used to create the models.  
 
 Note: I found an interesting thread about [Alias PowerAnimator v6.0 or v7.0](https://forums.irixnet.org/thread-128.html); ~~it seems that [Fabien Sanglard](https://fabiensanglard.net/) is writing a book about Quake, which is super good news! The thread has few images that might show in the book. The post is dated 2019 that makes me think that the book should be released soon.~~  
-Update: Fabien Sanglard confirms no Quake book schedueld
+Update: Fabien Sanglard confirms no Quake book scheduled.
 
 ![No Black Book](./img/noquake.png)
 
@@ -306,7 +306,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 
 ```
 
-There is two types of sking ```ALIAS_SKIN_SINGLE``` and ```ALIAS_SKIN_GROUP```. We will focus on ```ALIAS_SKIN_SINGLE```, we will skip ```ALIAS_SKIN_GROUP``` for now.
+There are two types of skin: ```ALIAS_SKIN_SINGLE``` and ```ALIAS_SKIN_GROUP```. We will focus on ```ALIAS_SKIN_SINGLE```, we will skip ```ALIAS_SKIN_GROUP``` for now.
 
 Now let's have a look at the ```Mod_LoadAliasSkin```
 
@@ -354,7 +354,7 @@ The skin/texture has no compression or a particular format; it is just an array 
 ## Coding
 Now time to code!
 
-For simplicity I will just go over the major changes, for full detials better look at the code!
+For simplicity I will just go over the major changes; for full details, better look at the code!
 
 As discussed, the client is the one that loads the model (after receiving the name from the server); for now, we will assume that the client knows what model to load.
 
@@ -390,7 +390,7 @@ public:
 ``` cpp
 void Client::TEMP_LoadPlayerModel(void)
 {
-   // Note: Some of these models only exist in reguesterd version!
+   // Note: Some of these models only exist in registered version!
    char szPlayerMdl[32];
    strcpy(szPlayerMdl, "progs/player.mdl");
    //strcpy(szPlayerMdl, "progs/soldier.mdl");
@@ -409,7 +409,7 @@ void Client::TEMP_LoadPlayerModel(void)
 }
 ```
 
-Creted a ```Model.h``` which will hold the stucts that define header and data object. It is important to note that for reading MDL file we have to have all the header fields there (```ModelHeader```), even if we wont use them, the main reason for this is to have correct header reading and go get the location of the data section location. For the ```AliasModelHeader``` it is just a header to make things easier, so we can ignore the fields we don't need for now.   
+Created a ```Model.h``` which will hold the structs that define the header and data objects. It is important to note that for reading the MDL file we have to have all the header fields there (```ModelHeader```), even if we won't use them; the main reason for this is to have correct header reading and to get the location of the data section. For the ```AliasModelHeader``` it is just a header to make things easier, so we can ignore the fields we don't need for now.   
 
 ``` cpp
 struct ModelData
@@ -430,7 +430,7 @@ struct ModelHeader
    int32_t iVersion;      // Model version (should be 6)
    Vec3 Scale;            // Model scale (a model can be smaller or bigger the the 3D model triangle defined)
    Vec3 ScaleOrigin;      // Model center
-   float fBoundingRadius; // Model redious 
+   float fBoundingRadius; // Model radius 
    Vec3 EyePosition;      // Model eye position
    int32_t iNumSkins;     // Number of skins
    int32_t iSkinWidth;    // Skin Width 
@@ -453,7 +453,7 @@ struct AliasModelHeader
 };
 ```
 
-```ModelManager``` is my implementation of ```model.c```, I called it manager because it handles diffrent model types.
+```ModelManager``` is my implementation of ```model.c```; I called it manager because it handles different model types.
 
 ``` cpp
 class ModelManager
@@ -503,7 +503,7 @@ This mirrors how Quake's ```mod_known``` array is zero-filled by virtue of being
 
 One more detail in ```Find``` that's worth knowing about. When the registry is full (```m_iKnownModelCount == MAX_KNOWN_MODEL```) and there's also no ```UNREFERENCED``` slot we can recycle, we have to bail out instead of writing into the next would-be slot, which is one element past the end of the array. Original Quake calls ```Sys_Error("mod_numknown == MAX_MOD_KNOWN")``` in this case; in DIYQuake we just return ```nullptr``` and let the caller deal with it (and the caller of ```Find``` checks for null before dereferencing).
 
-To stick to what Quake code does I created a render and a Screen class, the render doesn't do much exept drawing the Skin/Texture on the screen.  
+To stick to what Quake code does I created a Render and a Screen class; the Render doesn't do much except drawing the Skin/Texture on the screen.  
 
 ``` cpp
 struct Entity
@@ -519,7 +519,7 @@ public:
 
 private:
    void DrawEntitiesOnList(void); 
-   void AliasDrawModel(Entity* pCurrentEntity); // Draw the skin for alies model
+   void AliasDrawModel(Entity* pCurrentEntity); // Draw the skin for alias model
 
    Client* m_pClient;
    Video* m_pVideo;
@@ -527,7 +527,7 @@ private:
 };
 ```
 
-The function ```AliasDrawModel``` is the function that draws the skin to the video buffer. It is simple for loop going thoug height and width of the skin and copies it to the screen buffer.
+The function ```AliasDrawModel``` is the function that draws the skin to the video buffer. It is a simple for loop going through the height and width of the skin and copying it to the screen buffer.
 
 ``` cpp
 void Render::AliasDrawModel(Entity* pCurrentEntity)
@@ -554,7 +554,7 @@ void Render::AliasDrawModel(Entity* pCurrentEntity)
 }
 ```
 
-Now runnig we get to see the model skin!
+Now running, we get to see the model skin!
 
 ### Ranger  
 

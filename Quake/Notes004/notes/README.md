@@ -2,7 +2,7 @@
 So far, we were able to read the PAK file directory and now it is time to read and load a file. It would be a good start to read the color palette file, but what is a palette file? And what is it used for?  
 
 ## The Palette  
-In old days memory was a major factor on how games/applications are designed, systems where very limited with few MB of RAM. So, developers would cut memory consumption as much as possible to get their application running, and Quake was no exception. In games a lot of space (Memory/HDD) is consumed by the assets of the game. For an example, a texture (image) that is 640 pixels wide and 480 height making the total number of pixels in the image 307200 pixel, each pixel is represented in 3 colors, red, green, and blue with each color ranging from 0 to 255, we will need one byte per color making a total of 3 bytes for each pixel (3 x 8 = 24bit color depth). If you do the math 640 x 480 x 3 = 921600 = 900kb, that is a huge amount of memory. Here is a comparison table of different resolutions with multiple "color depth" configurations to have an idea how much memory is consumed.  
+In the old days, memory was a major factor in how games/applications were designed; systems were very limited, with only a few MB of RAM. So, developers would cut memory consumption as much as possible to get their application running, and Quake was no exception. In games a lot of space (Memory/HDD) is consumed by the assets of the game. For example, a texture (image) that is 640 pixels wide and 480 in height makes the total number of pixels in the image 307200 pixels, each pixel is represented in 3 colors, red, green, and blue with each color ranging from 0 to 255, we will need one byte per color making a total of 3 bytes for each pixel (3 x 8 = 24bit color depth). If you do the math 640 x 480 x 3 = 921600 = 900kb, that is a huge amount of memory. Here is a comparison table of different resolutions with multiple "color depth" configurations to have an idea how much memory is consumed.  
 
 | Resolution | Required memory  8-bit Color Depth | Required memory  16-bit Color Depth | Required memory  24-bit Color Depth | Required memory  32-bit Color Depth |
 | ---------- | ---------------------------------- | ----------------------------------- | ----------------------------------- | ----------------------------------- |
@@ -11,7 +11,7 @@ In old days memory was a major factor on how games/applications are designed, sy
 | 1024*768   | 768 kb                             | 1,5 MB                              | 2,25 MB                             | 3 MB                                |
 | 1280*1024  | 1,25 MB                            | 2,5 MB                              | 3,75 MB                             | 5 MB                                |
 
-(__Note:__ Size in memory/storage is not the only problem, one other issue you would face can you update the texture in time to achieve target FPS, more data to copy means more time is needed, and one possible solution to save some memory is to lower the number of bytes (color depth) that will define the pixels colors.  
+(__Note:__ Size in memory/storage is not the only problem, one other issue you would face can you update the texture in time to achieve target FPS, more data to copy means more time is needed, and one possible solution to save some memory is to lower the number of bytes (color depth) that will define the pixel's colors.  
 
 Quake decided to go with 8-bit color depth. 8-bits will give us a total of 256 colors, but which colors exactly? 8-bits cannot be split evenly between red, green and blue, one possible combination 3 bits Red, 3 bits Green, 2 bits Blue, no matter however you split the bits there will be a color that has a smaller number of bits than others. What about if I want only shades of Red in my colors and not green or blue? Using the 8-bits to address colors is very limiting and troublesome.  
 
@@ -21,7 +21,7 @@ Here is a simplified visualization of a 2-bit palette (possible values in binary
 
 ![PaletteSample](./img/palette.png)   
 
-Since the 8-bit color depth it will be possible to unique id 256 colors.  
+With 8-bit color depth, it is possible to uniquely identify 256 colors.  
 In Quake textures and images use a predefined palette file that could be found in the pack file. The palette loading process is part of the Host initialization.  
 
 ``` cpp
@@ -35,7 +35,7 @@ void Host_Init (quakeparms_t *parms)
 }
 ```
 
-The ```COM_LoadHunkFile``` function is just calls ```COM_LoadFile``` function passing both the palette file path and a ```1```.  
+The ```COM_LoadHunkFile``` function just calls the ```COM_LoadFile``` function, passing both the palette file path and a ```1```.  
 
 ``` cpp
 byte *COM_LoadHunkFile (char *path)
@@ -103,15 +103,15 @@ All the video buffer and game window creation functionality are in ```vid_win.c`
 
 __Note:__ This sub-system will be replaced with SDL, more details later.  
 
-MegaGraph Graphics Library or MGL in short is a graphics library created by [SciTech Software](https://web.archive.org/web/19961114152931/http://www.scitechsoft.com/). SciTech was a very well know company in the 90s for ```SciTech Display Doctor```  
+MegaGraph Graphics Library or MGL in short is a graphics library created by [SciTech Software](https://web.archive.org/web/19961114152931/http://www.scitechsoft.com/). SciTech was a very well-known company in the 90s for ```SciTech Display Doctor```  
 
 ![SciTech Display Doctor](./img/scitech_doctor.png)  
 
-SciTech Display Doctor is still used by enthusiast who want to run Windows 9x in a virtual machine.  
+SciTech Display Doctor is still used by enthusiasts who want to run Windows 9x in a virtual machine.  
 
 SciTech Software also released a [developer tools](https://web.archive.org/web/19961114153004/http://www.scitechsoft.com/devprod.html). One of those tools was a C++ graphics library MGL. MGL was released for both Windows and DOS. The library gave its users the power to create windows, extract info from the installed display adapter, draw primitive shapes, access to display buffer and a lot more!  
 
-With all what the library offers Quake doesn't utilize much of those fancy features, Quake used MGL as an interface with the display adapter and didn't use any of the shape drawing functionality in MGL.  
+Despite all that the library offers, Quake doesn't utilize many of those fancy features, Quake used MGL as an interface with the display adapter and didn't use any of the shape drawing functionality in MGL.  
 
 __Note:__ You can find a copy of MGL v1.1 under ```misc\docs\mgl11.zip```  (Quake used version 1.29)  
 __Note:__ DOS version of Quake did not use MGL.  
@@ -197,7 +197,7 @@ __Note:__ there is a total of three pointers in the ```viddef_t``` struct that p
 * __vid.conbuffer:__ used by console sub-system  
 * __vid.direct:__ used to draw images directly to buffer, like loading image  
 
-Those pointers get initialized depending on your multiple settings (eg. Full screen or windowed mode), but one spot where they get initialized is when calling ```VID_SetMode``` which in turn called ```VID_SetWindowedMode()``` which does that initialization of all tree pointers.  
+Those pointers get initialized depending on your multiple settings (eg. Full screen or windowed mode), but one spot where they get initialized is when calling ```VID_SetMode``` which in turn called ```VID_SetWindowedMode()``` which does the initialization of all three pointers.  
 
 ``` cpp
 vid.buffer = vid.conbuffer = vid.direct = dibdc->surface;
@@ -205,7 +205,7 @@ vid.buffer = vid.conbuffer = vid.direct = dibdc->surface;
 
 We have just scratched how the video sub-system work, there is a lot more going on, but that is enough for us to replace the system with SDL.  
 
-__Note:__ MGL lib will can utilize double and triple buffer if the display adopter supports it Triple buffer can be disable by passing ```-notriplebuf``` to the EXE.  
+__Note:__ MGL lib can utilize double and triple buffering if the display adapter supports it. Triple buffering can be disabled by passing ```-notriplebuf``` to the EXE.  
 
 ## Goals
 * Read the palette file.  
@@ -213,7 +213,7 @@ __Note:__ MGL lib will can utilize double and triple buffer if the display adopt
 * Draw the palette to screen.  
 
 ## Coding
-First thing to implement is the load function smiler to ```byte *COM_LoadFile (char *path, int usehunk)```, but instead of passing and integer as a indicator which part of the hunk to use, I will be replacing it with an enum.  
+First thing to implement is the load function similar to ```byte *COM_LoadFile (char *path, int usehunk)```, but instead of passing an integer as an indicator of which part of the hunk to use, I will be replacing it with an enum.  
 
 ``` cpp
 enum class LOAD_MEMORY 
@@ -268,7 +268,7 @@ void Video::Init(byte_t* pPalette)
 }
 ```
 
-A helper function is needed to convert the palette to a format that SDL can understands, a color in SDL is represented in the ```SDL_Color``` struct with has variables ```r, g, b``` for red, green and blue.  
+A helper function is needed to convert the palette to a format that SDL can understands, a color in SDL is represented in the ```SDL_Color``` struct, which has variables ```r, g, b``` for red, green and blue.  
 
 ``` cpp
 void Video::SetPalette(byte_t* pPalette)
@@ -364,7 +364,7 @@ void Video::Update(UpdateRect* pRectsList)
 
 ```
 
-Now that we are done with basic video functionality that we need for now, it is time to add few functions to draw something to the screen. The ```screen.c``` in Quake draws miscellanies stuff to the screen menu pause, status bar, console, chat, notify, etc. It might be a good spot to draw the palette there for now.  
+Now that we are done with basic video functionality that we need for now, it is time to add few functions to draw something to the screen. The ```screen.c``` in Quake draws miscellaneous stuff to the screen menu pause, status bar, console, chat, notify, etc. It might be a good spot to draw the palette there for now.  
 
 ``` cpp
 class Screen
@@ -382,7 +382,7 @@ protected:
 };
 ```
 
-I have created two different functions to draw the palette, first function would just draw each color as two pixels in width and full screen height.  
+I have created two different functions to draw the palette, the first function would just draw each color as two pixels in width and full screen height.  
 
 ``` cpp
 void Screen::TEMP_DrawPalette()

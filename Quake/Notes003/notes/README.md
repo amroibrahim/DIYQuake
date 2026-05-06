@@ -1,5 +1,5 @@
 # Notes 003 - PAK Files  
-After analyzing Quake memory manager, it is time to read some data and load it into memory. Quake assets are grouped into ```PAK``` files. Due to the naming, I was always under the impression it was compressed, but the is not the case. PAK file has a lot in common with DOOM's WAD file format.  
+After analyzing Quake memory manager, it is time to read some data and load it into memory. Quake assets are grouped into ```PAK``` files. Due to the naming, I was always under the impression it was compressed, but that is not the case. PAK file has a lot in common with DOOM's WAD file format.  
 
 ## Goals  
 * Analyze Quake PAK format  
@@ -10,7 +10,7 @@ After analyzing Quake memory manager, it is time to read some data and load it i
 Before we can read PAK files, we need to find them first! Quake code starts looking for PAK files as part of the common functionality initialization ```void COM_InitFilesystem(void)```. By default, Quake looks in the current working directory (Current EXE location), but this behavior can be modified by passing ```-basedir``` as a parameter to the EXE.  
 By default, the code looks for a sub-folder ```id1```, and the search process for PAK files starts.  
 
-Note: WinQuake supports the official mission pack for Quake, Quake Mission Pack 1, and Quake Mission Pack 2. Both those expansions start same EXE passing ```-hipnotic``` and ```-rogue``` respectively.  
+Note: WinQuake supports the official mission pack for Quake, Quake Mission Pack 1, and Quake Mission Pack 2. Both those expansions start the same EXE passing ```-hipnotic``` and ```-rogue``` respectively.  
 
 If you notice, there is a naming pattern for the pack folder.  
 * Quake, developed by ```id``` Software and released June 22, 1996.  
@@ -54,7 +54,7 @@ Visualizing a populated search list in memory
 
 Though all the nodes in the linked list are of type ```searchpath_t``` which are different, a node holding data about a directory, or a node holding data about a PAK file, a directory node is a node that has a ```filename``` set with a directory path and had its ```pack_t*``` pointing to null (last node in the above diagram). A PAK file node has a ```filename``` set to null and ```pack_t*``` pointing to a ```pack_t``` object.  
 
-Note: The use case for this is to look for a file in PAK files, and if not found, it looks in the directory. This is useful for modding a debugging. So if you are testing with new game assets no need to put them in a PAK file; just drop them in the PAK directory.  
+Note: The use case for this is to look for a file in PAK files, and if not found, it looks in the directory. This is useful for modding and debugging. So if you are testing with new game assets no need to put them in a PAK file; just drop them in the PAK directory.  
 
 The found PAK files have their defining node  
 
@@ -70,7 +70,7 @@ typedef struct pack_s
 
 The struct holds basic information that would allow us to access and search the PAK files. This time the ```filename[MAX_OSPATH]``` is populated with the PAK file name and path, but did you notice that the handle to the file is of type int (```int handle;```), normally you would expect a ```FILE*```. This was a nice simple trick to keep Quake portable, and to limit resource usage to ```MAX_HANDLES``` (which is set to 10), remember all OS related functionality is isolated in ```sys_*``` files, ```sys_win.c``` is the one that holds the ```FILE*``` pointer. ```FILE* sys_handles[MAX_HANDLES];``` is an array of handlers to files that Quake opens. The ```int handler``` is just an index into that array (there are few exceptions to this rule).  
 
-Let look at ```packfile_t* files```, this struct holds information about the files that are sored in the PAK file  
+Let look at ```packfile_t* files```, this struct holds information about the files that are stored in the PAK file  
 
 ```cpp
 typedef struct
@@ -80,7 +80,7 @@ typedef struct
 } packfile_t;
 ```
 
-visualizing those two struts together  
+visualizing those two structs together  
 
 ![pack](./img/pack.png)  
 
@@ -90,7 +90,7 @@ Now visualizing the complete picture in memory would look something like this.
 
 ![searchpathfull](./img/searchpathfull.png)  
 
-This is how the search linked list struct stores files in memory, now let’s have a look at the PAK files them self’s and how they are structured so we can extract the files from them and populate the above search list.  
+This is how the search linked list struct stores files in memory, now let’s have a look at the PAK files themselves and how they are structured so we can extract the files from them and populate the above search list.  
 
 ## Pack File
 Pack files are a simple format that groups files in a single big file (similar to DOOMs WAD). As with most formats, PAK files have a header that identifies the file and points to where you can read the directory list.  
@@ -106,7 +106,7 @@ typedef struct
 } dpackheader_t;
 ```
 
-After reading the header, we know where the dictionary offset is, and we can extract information about individual files in the PAK; each directory entry in the PAK is structured as following.  
+After reading the header, we know where the directory offset is, and we can extract information about individual files in the PAK; each directory entry in the PAK is structured as follows.  
 
 ```cpp
 typedef struct
@@ -116,7 +116,7 @@ typedef struct
 } dpackfile_t;
 ```
 
-Note: The dictionary entry in the PAK file (on disk) "name" is 56 bytes, but when Quake loads that into memory, it is copied into 64 bytes.  
+Note: The directory entry in the PAK file (on disk) "name" is 56 bytes, but when Quake loads that into memory, it is copied into 64 bytes.  
 
 Visualizing a PAK file
 
@@ -140,7 +140,7 @@ Now that we have the PAK files directory in memory let’s have a look at how Qu
 
 Note: Opening a file passing a valid ```FILE** file```, is used in demo play. We will investigate that in some other notes.  
  
-The main idea is a liner search through each pack file or directory in the search list ```com_searchpaths```.  
+The main idea is a linear search through each pack file or directory in the search list ```com_searchpaths```.  
 
 ```cpp
    ...
@@ -154,7 +154,7 @@ The main idea is a liner search through each pack file or directory in the searc
       if (search->pack)
       {
          pak = search->pack;
-         // liner search through all the files that are in the pak
+         // linear search through all the files that are in the pak
          for (i = 0; i < pak->numfiles; i++)
             if (!strcmp(pak->files[i].name, filename)) // Compare the file with the one we are looking for
             { 
@@ -166,7 +166,7 @@ The main idea is a liner search through each pack file or directory in the searc
                }
                else
                { 
-                  // open a new file instance (don't missup with the existing pack file handler)
+                  // open a new file instance (don't mix up with the existing pack file handler)
                   // This is used for demo replay file
                   *file = fopen(pak->filename, "rb");
                   if (*file)
@@ -191,7 +191,7 @@ Note: From my point of view, this function doesn't play by the rules, passing ``
 Finally, I would like to note that in memory, the search list stores the pack files in reverse order, which means PAK2 will show up in the search list before PAK1, and PAK1 will show before PAK0. This is very important for patching and game mods. If you want to overwrite a file in PAK0, release an updated version in PAK1 and leave PAK0 as is (searching for files is sequential).  
 
 ## Coding
-The first thing to do is implement searching for PAK files. To simplify things, I will implement "-basedir" parameter passing similar to Quake's implementation. The parameters allow the user to specify a PAK file path (convenient for debugging and molding). The Parameters struct stores the parameters passed to the EXE for us to use later as needed.
+The first thing to do is implement searching for PAK files. To simplify things, I will implement "-basedir" parameter passing similar to Quake's implementation. The parameters allow the user to specify a PAK file path (convenient for debugging and modding). The Parameters struct stores the parameters passed to the EXE for us to use later as needed.
 
 ```cpp
 struct Parameters
@@ -266,7 +266,7 @@ struct SearchPath
 };
 ```
 
-Once we have this in place, it is time to populate those structures load the pack file directory. 
+Once we have this in place, it is time to populate those structures and load the pack file directory. 
 
 ```cpp
 void Common::AddGameDirectory(std::string sPAKDirectory)

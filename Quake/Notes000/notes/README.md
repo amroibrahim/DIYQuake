@@ -9,9 +9,9 @@ Remember, I am just a computer graphics hobbyist, so before jumping into Quake c
 
 My approach implementing DIYQuake will be different; I will try to keep things much closer to how Quake implemented things (Like what the Handmade Quake project was doing. What a bummer that project got canceled).  
 
-As is was the case with DIYDOOM, I will be sharing my notes. Maybe they will help someone else break their fears looking at the game engine source code. Also, I will try to keep detailed documentation of my progress and findings within the Quake code.  
+As was the case with DIYDOOM, I will be sharing my notes. Maybe they will help someone else break their fears looking at the game engine source code. Also, I will try to keep detailed documentation of my progress and findings within the Quake code.  
 
-My focus will be on WinQuake; it is the software rendering version of Quake that was designed to run on Windows 95. What makes Quake stand out from earlier id Software titles is that Quake used, 3D models, and 3D rendering pipeline (allowing for rooms on top of each other, unlike in DOOM), both lightmaps, and dynamic lighting, and lots more! It is also important to note that the game requred a CPU with a FPU (Floating point unit). This is why the Pentium processor was required to run the game.
+My focus will be on WinQuake; it is the software rendering version of Quake that was designed to run on Windows 95. What makes Quake stand out from earlier id Software titles is that Quake used, 3D models, and 3D rendering pipeline (allowing for rooms on top of each other, unlike in DOOM), both lightmaps, and dynamic lighting, and lots more! It is also important to note that the game required a CPU with an FPU (Floating point unit). This is why the Pentium processor was required to run the game.
 **Note:** All Pentium processors came with an FPU, but not all 486 did.
 
 
@@ -22,15 +22,15 @@ To relive the release of Quake, it's a good idea to take a look at the game's re
   
 Due to the size of the game's assets, a whopping ~50MB, Quake was released on a CD-ROM.    
 **Note:** Yes, 50MB back then was a lot of space. I only had a 500MB HDD.   
-**Note:** I have seen few boxs variants that mentioned 486 DX4 / 100MHz is supported (DX4 is a 486 with a FPU)
+**Note:** I have seen a few box variants that mentioned 486 DX4 / 100MHz is supported (DX4 is a 486 with an FPU)
 
 ![486 DX4](./img/486dx.png)  
 
-Here is [another box veriant](./img/box2.png), which explicitly say "absolutely must have a math copprocessor!".  
+Here is [another box variant](./img/box2.png), which explicitly says "absolutely must have a math coprocessor!".  
 
 After the release of Quake in 1996, the game received a handful of updates during its lifetime. The most notable update was V1.09 which added OpenGL hardware acceleration support.
 
-I was able to get my hands on two different Quake CD releases, V1.06 and V1.09. Both versions came with different binaries but had identical PAK files. The PAK files contain the game's assets: texture, models, maps, etc. Here is a listing of the Quake directory after installation:
+I was able to get my hands on two different Quake CD releases, V1.06 and V1.09. Both versions came with different binaries but had identical PAK files. The PAK files contain the game's assets: textures, models, maps, etc. Here is a listing of the Quake directory after installation:
 
 V1.06 CD-ROM  
 
@@ -89,7 +89,7 @@ W_SPIKE.MS2   ZOMBIE.MS2   ZOM_GIB.MS2
 **GLQUAKE.EXE** Hardware accelerated OpenGL version  
 
 If you buy the Steam version of Quake, you will get V1.09 and Quake world binaries.
-As of August 19 2021, a remaster version of Quake was released, a new "rerelease" folder with a new PAK file can be found under the installion folder.
+As of August 19 2021, a remaster version of Quake was released, a new "rerelease" folder with a new PAK file can be found under the installation folder.
 
 Some interesting differences when comparing the CD-ROMs:
 
@@ -113,7 +113,7 @@ But the question is, how can you compile the code and get a working binary? This
 Compile original WinQuake
 
 ## Compiling the code
-The easiest way to get the code to compile is to find a Windows 9x machine (maybe a virtual machine) and install Visual Studio 6. Then, with no code changes, you would open the [works space](https://github.com/id-Software/Quake/blob/master/WinQuake/WinQuake.dsw) file and compile the project. However, that is not what you might want; you'll likely want this code to compile under a modern operating system with a newer version of Visual Studio.  
+The easiest way to get the code to compile is to find a Windows 9x machine (maybe a virtual machine) and install Visual Studio 6. Then, with no code changes, you would open the [workspace](https://github.com/id-Software/Quake/blob/master/WinQuake/WinQuake.dsw) file and compile the project. However, that is not what you might want; you'll likely want this code to compile under a modern operating system with a newer version of Visual Studio.  
 
 **Note:** You might need to do an EOL (end of line) conversion. The files checked into the GitHub repo are in Unix EOL format; Win98 will not recognize the format as-is.
 

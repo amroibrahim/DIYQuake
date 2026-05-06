@@ -15,17 +15,17 @@ Enough rambling, now get ready for a long heavy talk and some surprises!
 
 ## Goals
 * Understand Quake memory manager.
-* Implement smiler memory manager.
+* Implement a similar memory manager.
 
 ## Introduction
 Quake memory manager is designed and optimized for Quake needs, and it is more advanced than DOOM's. Here are some advantages that Quake memory manager provides.    
-*  Skips calling OS APIs to allocate/dealate memory, leading to better performance (malloc calls OS APIs behind the scenes).  
-*  Pre-allocated all needed memory beforehand, no running out of memory while playing Quake.  
-*  A more refined control on memory.  
+*  Skips calling OS APIs to allocate/deallocate memory, leading to better performance (malloc calls OS APIs behind the scenes).  
+*  Pre-allocates all needed memory beforehand, so no running out of memory while playing Quake.  
+*  More refined control over memory.  
   
 Quake box states that it requires a minimum of 8MB of RAM to run Quake and allocate up to 16MB if the system has enough available. Most of the memory manager functionality exist in [zone.c](../../Notes000/src/WinQuake/WinQuake/zone.c).  
   
-Quake memory manager journey start at WinMain in [sys_win.c](../../Notes000/src/WinQuake/WinQuake/sys_win.c#L776). WinMain calls the windows API ```GlobalMemoryStatus (&lpBuffer);```, which would return the memory status in the struct ```lpBuffer```. Based on the memory available, a decision is taken. Let us have a closer look at the code.  
+Quake's memory manager journey starts at WinMain in [sys_win.c](../../Notes000/src/WinQuake/WinQuake/sys_win.c#L776). WinMain calls the windows API ```GlobalMemoryStatus (&lpBuffer);```, which would return the memory status in the struct ```lpBuffer```. Based on the memory available, a decision is taken. Let us have a closer look at the code.  
 
 Note: Notice that the logic is implemented in ```sys_*.c```. It is OS-specific. The logic we are about to discuss is for Win9x and does not apply to DOS, Linux, etc.  
 
@@ -62,7 +62,7 @@ if (COM_CheckParm ("-heapsize"))
 // Allocate the selected amount of memory
 parms.membase = malloc (parms.memsize);
 
-// Will take about this function below
+// Will talk about this function below
 Sys_PageIn (parms.membase, parms.memsize);
 ```
 
@@ -147,7 +147,7 @@ typedef struct memblock_s
 } memblock_t;
 ```
 
-The Zone is a simplified version of the [free list data structure](https://en.wikipedia.org/wiki/Free_list), which is a double liked list, so each block has its own next and previous pointers to its sibling blocks. Block ```tag``` are to indicate if they are used or free.  
+The Zone is a simplified version of the [free list data structure](https://en.wikipedia.org/wiki/Free_list), which is a doubly linked list, so each block has its own next and previous pointers to its sibling blocks. Block ```tag``` are to indicate if they are used or free.  
 Now let us have a look at the zone header. 
 
 ```cpp
@@ -170,7 +170,7 @@ Here is how the Zone would look like in memory if it had few blocks allocated.
 
 ![zone](./img/zonememory.png)
 
-De-allocation in Zone works in reverse behavior. The implementation can be found in ```Z_Free (void *ptr)```. When a block is to be freed, it gets tagged as free, then its neighboring previous and next blocks tags are inspected. If they are used, nothing is updated. If they are free, then they get merged to form a single free block. This will guaranty consecutive free memory blocks are merged to a single block (so you will never see two blocks next to each other that are free).
+De-allocation in Zone works in reverse behavior. The implementation can be found in ```Z_Free (void *ptr)```. When a block is to be freed, it gets tagged as free, then its neighboring previous and next blocks tags are inspected. If they are used, nothing is updated. If they are free, then they get merged to form a single free block. This will guarantee consecutive free memory blocks are merged into a single block (so you will never see two blocks next to each other that are free).
 
 ## Temp Hunk
 Temp hunk is the simplest hunk. It gets allocated on the high end of memory. It gets de-allocated with any hunk allocation on the high side or reading the values for high used. Temp hunk is used to load data from the disk before it gets moved to another place in memory (usually cache).  
@@ -380,6 +380,6 @@ I have not tested this code yet! Best way to test it is to use it. So lets test 
 
 ## Other Notes 
 Some overlooked details in Quake zone.c.
-some times they use the lib function ```memset``` where they should used ```Q_memset```.  
-some times they use the lib function ```strncpy``` where they should used ```Q_strncpy```.  
+Sometimes they use the lib function ```memset``` where they should use ```Q_memset```.  
+Sometimes they use the lib function ```strncpy``` where they should use ```Q_strncpy```.  
 ```Cache_Compact``` was never implemented, my sense tells me this was a defragmentation function, as cache would get evicted due to LRU, memory gaps could appear, I would assume that ```Cache_Compact``` would move data around in memory to bring all the free space fragment as one big free block.  
